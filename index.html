@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Farm Monitoring Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="dashboard" id="dashboard">
+
+    <header class="page-header">
+        <h1 class="page-header__title">Solar Farm Monitoring Dashboard</h1>
+    </header>
+
+    <aside class="sidebar">
+        <div class="sidebar__header">
+            <h2 class="sidebar__title">Maintenance Queue</h2>
+            <p class="sidebar__subtitle">Top 30 Worst Panels</p>
+        </div>
+
+        <!-- Populated by MaintenanceListView.render(panels) -->
+        <div class="maintenance-list" id="maintenanceList">
+            <div class="maintenance-card" data-panel-id="18239">
+                <div class="maintenance-card__rank">#1</div>
+                <div class="maintenance-card__id">Panel 18239</div>
+                <div class="maintenance-card__efficiency">41.8%</div>
+            </div>
+            <div class="maintenance-card" data-panel-id="9732">
+                <div class="maintenance-card__rank">#2</div>
+                <div class="maintenance-card__id">Panel 9732</div>
+                <div class="maintenance-card__efficiency">43.2%</div>
+            </div>
+            <div class="maintenance-card" data-panel-id="62818">
+                <div class="maintenance-card__rank">#3</div>
+                <div class="maintenance-card__id">Panel 62818</div>
+                <div class="maintenance-card__efficiency">44.5%</div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+    <main class="main-content">
+        <section class="grid-section">
+            <!-- Populated by SolarGridView.render(zones), 20x20 -->
+            <div class="solar-grid" id="solarGrid">
+                <div class="grid-cell grid-cell--healthy"  data-row="0" data-col="0" data-zone-id="0-0"></div>
+                <div class="grid-cell grid-cell--healthy"  data-row="0" data-col="1" data-zone-id="0-1"></div>
+                <div class="grid-cell grid-cell--minor"    data-row="0" data-col="2" data-zone-id="0-2"></div>
+                <div class="grid-cell grid-cell--moderate" data-row="0" data-col="3" data-zone-id="0-3"></div>
+                <div class="grid-cell grid-cell--severe"   data-row="0" data-col="4" data-zone-id="0-4"></div>
+                <div class="grid-cell grid-cell--minor"    data-row="0" data-col="5" data-zone-id="0-5"></div>
+                <div class="grid-cell grid-cell--healthy"  data-row="0" data-col="6" data-zone-id="0-6"></div>
+                <div class="grid-cell grid-cell--moderate" data-row="0" data-col="7" data-zone-id="0-7"></div>
+                <div class="grid-cell grid-cell--severe"   data-row="0" data-col="8" data-zone-id="0-8"></div>
+                <div class="grid-cell grid-cell--minor"    data-row="0" data-col="9" data-zone-id="0-9"></div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- ================= MODAL ================= -->
+<div class="modal" id="modal">
+    <div class="modal__backdrop" id="modalBackdrop"></div>
+    <div class="modal__content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <button class="modal__close" id="modalClose" aria-label="Close modal">✕</button>
+
+        <h2 class="modal__title" id="modalTitle">Zone (8,12)</h2>
+
+        <!-- Populated by ModalView.renderStats(zoneData) -->
+        <div class="modal__statistics" id="modalStatistics">
+            <div class="modal__stat">
+                <span>Panels</span><strong>5000</strong>
+            </div>
+            <div class="modal__stat">
+                <span>Healthy</span><strong>4513</strong>
+            </div>
+            <div class="modal__stat">
+                <span>Minor</span><strong>284</strong>
+            </div>
+            <div class="modal__stat">
+                <span>Moderate</span><strong>134</strong>
+            </div>
+            <div class="modal__stat">
+                <span>Severe</span><strong>69</strong>
+            </div>
+            <div class="modal__stat">
+                <span>Average Efficiency</span><strong>91.4%</strong>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

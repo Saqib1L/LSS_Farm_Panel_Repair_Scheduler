@@ -1,0 +1,194 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Inter, Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+}
+
+/* ================= Layout ================= */
+.dashboard {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    grid-template-rows: 60px 1fr;
+    grid-template-areas:
+        "header header"
+        "sidebar main";
+    height: 100vh;
+}
+
+.page-header {
+    grid-area: header;
+    height: 60px;
+    background-color: #0F1111;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 16px;
+}
+
+/* ================= Sidebar ================= */
+.sidebar {
+    grid-area: sidebar;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* allows child flex:1 to scroll instead of overflowing */
+    background: #141821;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    color: #fff;
+}
+
+.sidebar__header {
+    padding: 20px 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sidebar__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.sidebar__subtitle {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.maintenance-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.maintenance-card {
+    display: grid;
+    grid-template-columns: 40px 1fr 60px;
+    align-items: center;
+    padding: 10px 12px;
+    cursor: pointer;
+}
+
+.maintenance-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.maintenance-card__efficiency {
+    text-align: right;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* ================= Main ================= */
+.main-content {
+    grid-area: main;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    overflow: auto;
+    min-height: 0;
+}
+
+.grid-section {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ================= Grid ================= */
+.solar-grid {
+    display: grid;
+    grid-template-columns: repeat(20, 40px);
+    grid-template-rows: repeat(20, 40px);
+    gap: 8px;
+}
+
+.grid-cell {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: .18s;
+    border: 1px solid rgba(255, 255, 255, .05);
+}
+
+.grid-cell:hover {
+    transform: scale(1.08);
+    filter: brightness(1.15);
+}
+
+/* Status colors — class name should match the zone's dominant status in the JSON */
+.grid-cell--healthy {
+    background: rgba(59, 130, 246, .15);
+}
+
+.grid-cell--minor {
+    background: rgba(59, 130, 246, .35);
+}
+
+.grid-cell--moderate {
+    background: rgba(59, 130, 246, .60);
+}
+
+.grid-cell--severe {
+    background: rgba(59, 130, 246, .90);
+}
+
+/* ================= Modal ================= */
+.modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+}
+
+.modal--open {
+    display: block;
+}
+
+.modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, .6);
+}
+
+.modal__content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 420px;
+    background: #172033;
+    border-radius: 16px;
+    padding: 28px;
+    border: 1px solid rgba(255, 255, 255, .08);
+    z-index: 5;
+}
+
+.modal__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    border: none;
+    background: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.modal__statistics {
+    display: grid;
+    gap: 14px;
+    margin-top: 24px;
+}
+
+.modal__stat {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
