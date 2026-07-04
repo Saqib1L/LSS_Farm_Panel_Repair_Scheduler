@@ -12,7 +12,7 @@
     <header class="page-header">
         <h1 class="page-header__title">Solar Farm Monitoring System</h1>
     </header>
-
+    
     <aside class="sidebar">
         <div class="sidebar__header">
             <h2 class="sidebar__title">Maintenance Queue</h2>
@@ -56,6 +56,18 @@
                 <div class="grid-cell grid-cell--minor"    data-row="0" data-col="9" data-zone-id="0-9"></div>
             </div>
         </section>
+        <div id="slot"
+        style="
+            position: absolute;
+            width: 192px;
+            height: 192px;
+            top: 0;
+            right: 0;
+            border: 2px solid white;
+            box-sizing: border-box;
+        ">
+            <h1>Not available...</h1>
+        </div>
     </main>
 </div>
 
@@ -91,4 +103,25 @@
     </div>
 </div>
 </body>
+    <script>
+        const gridCells = document.querySelectorAll('.grid-cell');
+        const slotBox = document.getElementById('slot');
+        let streamConnection = null;
+        gridCells.forEach((gridCell) => {
+            gridCell.addEventListener('click', () => {
+                const gridCellId = gridCell.getAttribute('data-zone-id');
+                console.log(gridCellId);
+                if(streamConnection) streamConnection.close();
+                streamConnection = new EventSource(`http://localhost:3000/clicked/${gridCellId}`);
+                streamConnection.onmessage = function(event) {
+                    const dataHtmlFromServer = event.data;
+                    slotBox.innerHTML = dataHtmlFromServer;
+                }
+            });
+        });
+
+        function closeGrid() {
+            streamConnection.close();
+        };
+    </script>
 </html>
