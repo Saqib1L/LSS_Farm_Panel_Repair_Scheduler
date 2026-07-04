@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/Saqib1L/LSS_Farm_Panel_Repair_Scheduler/issues"
   },
-  "homepage": "https://github.com/Saqib1L/LSS_Farm_Panel_Repair_Scheduler#readme"
+  "homepage": "https://github.com/Saqib1L/LSS_Farm_Panel_Repair_Scheduler#readme",
+  "dependencies": {
+    "express": "5.2.1"
+  }
 }
