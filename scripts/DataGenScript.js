@@ -27,19 +27,26 @@ const updateData = async () => {
 // Generating 200k data 
 const generateData = async () => {
   let capacityReseter = 1;
-  let gridZones = 1;
+  let gridZoneRow = 1;
+  let gridZoneCol = 1;
 
   for(let i=0; i<totalData; i++) {
     if(capacityReseter === 501) {
       capacityReseter = 1;
-      gridZones++;
+      gridZoneCol++;
     }
+
+    if(gridZoneCol === 21) {
+      gridZoneCol = 1;
+      gridZoneRow++;
+    }
+    
     await dataArray.push({
       "id": `SP${String(i+1).padStart(7, '0')}`,
       "efficiency": 100.00,
       "severity": "Healthy",
       "maintenance_priority": "None",
-      "zone": `Z-${gridZones}`
+      "zone": `ZONE-R${gridZoneRow}-C${gridZoneCol}`
     });
     capacityReseter++;
   }
@@ -47,5 +54,9 @@ const generateData = async () => {
   await updateData();
 }
 
-generateData();
-console.log(dataArray);
+try {
+  generateData();
+  console.log("[SERVER]: The data has been generated and updated to data.json.");
+} catch (error) {
+  console.log("[ERROR]: ", error);
+}
