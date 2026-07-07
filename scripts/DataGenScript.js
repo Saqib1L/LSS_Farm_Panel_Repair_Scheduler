@@ -1,4 +1,3 @@
-import { read } from 'fs';
 import fs from 'fs/promises';
 const filePath = "../data.json";
 const totalData = 200000;
@@ -14,6 +13,7 @@ const readData = async () => {
     if(error.code === "ENOENT") {
       console.log("[SERVER]: The data.json does not exists, the program is creating one...");
       await fs.writeFile(filePath, JSON.stringify([], null, 2));
+      return [];
     }
   }
 }
@@ -25,7 +25,7 @@ const updateData = async () => {
 };
 
 // Generating 200k data 
-const generateData = async () => {
+const generateData = () => {
   let capacityReseter = 1;
   let gridZoneRow = 1;
   let gridZoneCol = 1;
@@ -41,7 +41,7 @@ const generateData = async () => {
       gridZoneRow++;
     }
     
-    await dataArray.push({
+    dataArray.push({
       "id": `SP${String(i+1).padStart(7, '0')}`,
       "efficiency": 100.00,
       "severity": "Healthy",
@@ -51,11 +51,11 @@ const generateData = async () => {
     capacityReseter++;
   }
 
-  await updateData();
+  updateData();
 }
 
 try {
-  generateData();
+  await generateData();
   console.log("[SERVER]: The data has been generated and updated to data.json.");
 } catch (error) {
   console.log("[ERROR]: ", error);
