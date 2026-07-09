@@ -34,9 +34,14 @@ app.get('/clicked/:id', (req, res) => {
     const htmlContent = `
       <div class="profile-card" id="sse-wrapper-${id}">
           <h2>Grid informations: </h2>
-          <p>Grid ID : ${id}</p>
-          <p>Status: Active</p>
-          <p>Time: ${new Date().toLocaleTimeString()} </p>
+          <p>Grid ID = ${id}</p>
+          <p>Number of panels = </p>
+          <p>Healthy panels = </p>
+          <p>Minor degradated panels = </p>
+          <p>Moderate degradated panels = </p>
+          <p>Severe degradated panels = </p>
+          <p>Worst panel = </p>
+          <p>Best panel  = </p>
       </div>
     `;
     const cleanHtml = htmlContent.replace(/\n/g, '').trim();
