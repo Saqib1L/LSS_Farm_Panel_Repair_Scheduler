@@ -1,3 +1,5 @@
+import net from 'net';
+
 let PanelData = [];
 
 import fs from 'fs/promises';
@@ -7,8 +9,54 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const filePath = path.join(__dirname, '..', 'data.json');
 
-
 const totalData = 200000;
+
+// Connection properties for statistics.js
+const PORT = 9000;
+const HOST = '127.0.0.1';
+let client;
+
+// Connect to statistics functions 
+const connect = () => {
+  client = new net.Socket();
+  // Error checking
+  client.on('error', (err) => {
+    if(err.code === "ECONNREFUSED") {
+      console.log("Receiver not ready yet. Retrying in 1 second...");
+      setTimeout(connect, 1000);
+    };
+  });
+
+  client.on('connect', () => {
+    console.log("[SERVER]: The connection is open on port ", PORT);
+  });
+
+  // Close connection
+  client.on('close', () => {
+    console.log("[SERVER]: The connection is closed");
+  });
+
+  // Trigger connection
+  client.connect(PORT, HOST);
+};
+
+// Sending data to statistics.js
+const sendStreamData = () => {
+  let batch = [];
+  PanelData.forEach((panel) => {
+    batch.push({
+      id: panel.id,
+      val: panel
+    });
+
+    if(batch.length === totalData/40) {
+      client.write(JSON.stringify(batch) + '\n');
+      batch = [];
+    };
+  });
+};
+
+
 
 // Retrieve data from data.json
 const readData = async () => {
@@ -99,6 +147,7 @@ const TICK_INTERVAL_MS = 1000;
 let tickCount = 0;
 
 function runSimulation() {
+
   console.log(`[SIM] Loaded ${PanelData.length} panels. Starting...`);
 
   setInterval(async function tick() {
@@ -116,11 +165,14 @@ function runSimulation() {
       }
       console.log(`[SIM] Day ${tickCount}:`, counts);
     
+    // Calling send data function
+    sendStreamData();
   }, TICK_INTERVAL_MS);
 }
 
 const updateData = async () => {
   await fs.writeFile(filePath, JSON.stringify(PanelData, null, 2));
 };
-
+// Open connection
+connect();
 runSimulation();
