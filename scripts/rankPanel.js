@@ -20,7 +20,35 @@ const readData = async () => {
   }
 };
 
-let panels = readData();
+let panels = await readData();
+let sortedPanels = [...panels];
+let totalPanels = sortedPanels.length;
 
-let topThirtyWorst = [];
+const worstPanelLimit = 30; 
 
+// partial bubble sort
+
+for (let i = 0; i < worstPanelLimit && i < totalPanels; i++) {
+  let swapped = false;
+  
+  for (let j = totalPanels - 1; j > i; j--) {
+    
+    if (sortedPanels[j].efficiency < sortedPanels[j - 1].efficiency) {
+      
+      let temp = sortedPanels[j];
+      sortedPanels[j] = sortedPanels[j - 1];
+      sortedPanels[j - 1] = temp;
+      
+      swapped = true;
+    }
+  }
+
+  if (!swapped) break;
+}
+
+
+let topWorstPanels = sortedPanels.slice(0, worstPanelLimit);
+
+// Menampilkan hasil ke terminal
+console.log(`find 30 worst solar panel`);
+console.log(topWorstPanels);
