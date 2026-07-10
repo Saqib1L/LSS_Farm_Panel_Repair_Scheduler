@@ -4,7 +4,9 @@
   "description": "Solar farm real-time monitoring system features :  1. Load / Generate Sensor Dataset (200,000 panels); 2. Start Real-Time Monitoring System; 3. Search Panel by ID; 4. View Top-K Worst Panels (Maintenance Priority) 5. View Fault Summary Statistics 0. Exit",
   "main": "._script.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-all": "concurrently \"(cd ./scripts/ && node server.js)\" \"(cd ./scripts/ && node panelsimulation.js)\" \"(cd ./scripts/ && node rankpanel.js)\" \"(cd ./scripts/ && node statistics.js)\"",
+    "start-stream": "concurrently \"(cd ./scripts/ && node panelsimulation.js)\" \"(cd ./scripts/ && node statistics.js)\""
   },
   "repository": {
     "type": "git",
@@ -22,6 +24,7 @@
     "express": "5.2.1"
   },
   "devDependencies": {
+    "concurrently": "^10.0.3",
     "nodemon": "3.1.14"
   }
 }
