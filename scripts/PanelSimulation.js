@@ -11,35 +11,60 @@ const filePath = path.join(__dirname, '..', 'data.json');
 
 const totalData = 200000;
 
-// Connection properties for statistics.js
+// Connection properties for streaming data
 const PORT_FOR_STATISTIC = 9000;
 const PORT_FOR_RANK_PANEL = 9001;
 const HOST = '127.0.0.1';
-let client;
+let client_statistic;
+let client_ranking;
 
 // Connect to statistics functions 
 const connectToStatistic = () => {
-  client = new net.Socket();
+  client_statistic = new net.Socket();
   // Error checking
-  client.on('error', (err) => {
+  client_statistic.on('error', (err) => {
     if(err.code === "ECONNREFUSED") {
-      console.log("[SERVER](SENDER): Receiver not ready yet. Retrying in 1 second...");
+      console.log("[PANEL_SIMULATION][SENDER][TARGET: STATS]: Receiver not ready yet. Retrying in 1 second...");
       setTimeout(connectToStatistic, 1000);
     };
   });
 
-  client.on('connect', () => {
-    console.log("[SERVER](SENDER): The connection is open on port ", PORT_FOR_STATISTIC);
+  client_statistic.on('connect', () => {
+    console.log("[PANEL_SIMULATION][SENDER][TARGET: STATS]: The connection is open on port ", PORT_FOR_STATISTIC);
   });
 
   // Close connection
-  client.on('close', () => {
-    console.log("[SERVER](SENDER): The connection is closed");
+  client_statistic.on('close', () => {
+    console.log("[PANEL_SIMULATION][SENDER][TARGET: STATS]: The connection is closed");
   });
 
   // Trigger connection
-  client.connect(PORT_FOR_STATISTIC, HOST);
+  client_statistic.connect(PORT_FOR_STATISTIC, HOST);
 };
+
+// Connect to rank panel functions
+const connectToRanking = () => {
+  client_ranking = new net.Socket();
+
+  client_ranking.on('error', (err) => {
+    if(err.code === "ECONNREFUSED") {
+      console.log("[PANEL_SIMULATION][SENDER][TARGET: RANKS]: Receiver not ready yet. Retrying in 1 second...");
+      setTimeout(connectToStatistic, 1000);
+    };
+  });
+
+  client_ranking.on('connect', () => {
+    console.log("[PANEL_SIMULATION][SENDER][TARGET: RANKS]: The connection is open on port ", PORT_FOR_RANK_PANEL);
+  });
+
+  // Close connection
+  client_ranking.on('close', () => {
+    console.log("[PANEL_SIMULATION][SENDER][TARGET: RANKS]: The connection is closed");
+  });
+
+  // Trigger connection
+  client_ranking.connect(PORT_FOR_RANK_PANEL, HOST);
+}
 
 // Sending data to statistics.js
 const sendStreamData = () => {
@@ -51,7 +76,8 @@ const sendStreamData = () => {
     });
 
     if(batch.length === totalData/40) {
-      client.write(JSON.stringify(batch) + '\n');
+      if(!client_statistic.pending) client_statistic.write(JSON.stringify(batch) + '\n');
+      if(!client_ranking.pending) client_ranking.write(JSON.stringify(batch) + '\n');
       batch = [];
     };
   });
@@ -70,7 +96,7 @@ const readData = async () => {
     return JSON.parse(rawData);
   } catch (error) {
     if(error.code === "ENOENT") {
-      console.log("[SERVER](SENDER): The data.json does not exists, the program is creating one...");
+      console.log("[SERVER][SENDER][TARGET: STATS]: The data.json does not exists, the program is creating one...");
       await fs.writeFile(filePath, JSON.stringify([], null, 2));
       return [];
     }
@@ -167,7 +193,7 @@ function runSimulation() {
       for (const panel of PanelData) {
         counts[panel.severity]++;
       }
-      console.log(`[SIM] Day ${tickCount}:`, counts);
+      // console.log(`[SIM] Day ${tickCount}:`, counts);
     
     // Calling send data function
     sendStreamData();
@@ -179,4 +205,5 @@ const updateData = async () => {
 };
 // Open connection
 connectToStatistic();
+connectToRanking();
 runSimulation();

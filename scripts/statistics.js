@@ -24,7 +24,7 @@ const server = net.createServer((socket) => {
   });
 });
 
-server.listen(PORT, HOST, () => console.log("[SERVER](RECEIVER): Receiver is listening on port ", PORT));
+server.listen(PORT, HOST, () => console.log("[STATISTICS][RECEIVER]: Receiver is listening on port ", PORT));
 
 // Statistics calculation
 panels.forEach((panel) => {
