@@ -22,18 +22,18 @@ const connect = () => {
   // Error checking
   client.on('error', (err) => {
     if(err.code === "ECONNREFUSED") {
-      console.log("Receiver not ready yet. Retrying in 1 second...");
+      console.log("[SERVER](SENDER): Receiver not ready yet. Retrying in 1 second...");
       setTimeout(connect, 1000);
     };
   });
 
   client.on('connect', () => {
-    console.log("[SERVER]: The connection is open on port ", PORT);
+    console.log("[SERVER](SENDER): The connection is open on port ", PORT);
   });
 
   // Close connection
   client.on('close', () => {
-    console.log("[SERVER]: The connection is closed");
+    console.log("[SERVER](SENDER): The connection is closed");
   });
 
   // Trigger connection
@@ -43,7 +43,7 @@ const connect = () => {
 // Sending data to statistics.js
 const sendStreamData = () => {
   let batch = [];
-  PanelData.forEach((panel) => {
+  PanelData?.forEach((panel) => {
     batch.push({
       id: panel.id,
       val: panel
@@ -69,7 +69,7 @@ const readData = async () => {
     return JSON.parse(rawData);
   } catch (error) {
     if(error.code === "ENOENT") {
-      console.log("[SERVER]: The data.json does not exists, the program is creating one...");
+      console.log("[SERVER](SENDER): The data.json does not exists, the program is creating one...");
       await fs.writeFile(filePath, JSON.stringify([], null, 2));
       return [];
     }
@@ -148,19 +148,19 @@ let tickCount = 0;
 
 function runSimulation() {
 
-  console.log(`[SIM] Loaded ${PanelData.length} panels. Starting...`);
+  console.log(`[SIM] Loaded ${PanelData?.length} panels. Starting...`);
 
   setInterval(async function tick() {
     tickCount++;
 
-    for (const panel of PanelData) {
+    for (const panel in PanelData) {
       simulateDegradationFactors(panel);
     }
 
     await updateData();
     
     const counts = { Healthy: 0, "Minor Degradation": 0, "Moderate Degradation": 0, "Severe Degradation": 0 };
-      for (const panel of PanelData) {
+      for (const panel in PanelData) {
         counts[panel.severity]++;
       }
       console.log(`[SIM] Day ${tickCount}:`, counts);
@@ -171,7 +171,7 @@ function runSimulation() {
 }
 
 const updateData = async () => {
-  await fs.writeFile(filePath, JSON.stringify(PanelData, null, 2));
+  await fs.writeFile(filePath, JSON.stringify(PanelData ?? [], null, 2));
 };
 // Open connection
 connect();
