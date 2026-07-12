@@ -12,23 +12,24 @@ const filePath = path.join(__dirname, '..', 'data.json');
 const totalData = 200000;
 
 // Connection properties for statistics.js
-const PORT = 9000;
+const PORT_FOR_STATISTIC = 9000;
+const PORT_FOR_RANK_PANEL = 9001;
 const HOST = '127.0.0.1';
 let client;
 
 // Connect to statistics functions 
-const connect = () => {
+const connectToStatistic = () => {
   client = new net.Socket();
   // Error checking
   client.on('error', (err) => {
     if(err.code === "ECONNREFUSED") {
       console.log("[SERVER](SENDER): Receiver not ready yet. Retrying in 1 second...");
-      setTimeout(connect, 1000);
+      setTimeout(connectToStatistic, 1000);
     };
   });
 
   client.on('connect', () => {
-    console.log("[SERVER](SENDER): The connection is open on port ", PORT);
+    console.log("[SERVER](SENDER): The connection is open on port ", PORT_FOR_STATISTIC);
   });
 
   // Close connection
@@ -37,13 +38,13 @@ const connect = () => {
   });
 
   // Trigger connection
-  client.connect(PORT, HOST);
+  client.connect(PORT_FOR_STATISTIC, HOST);
 };
 
 // Sending data to statistics.js
 const sendStreamData = () => {
   let batch = [];
-  PanelData?.forEach((panel) => {
+  PanelData.forEach((panel) => {
     batch.push({
       id: panel.id,
       val: panel
@@ -77,6 +78,9 @@ const readData = async () => {
 }
 
 PanelData = await readData();
+
+// Preventing program crash
+PanelData = PanelData ?? [];
 
 const AGEING_RATE = 0.002;
 
@@ -129,8 +133,8 @@ function simulateDegradationFactors(panel) {
   //Rounds efficiency to 3 decimal places.
   newEfficiency = Math.round(newEfficiency * 1000) / 1000;
 
-  panel.efficiency = newEfficiency;
   const {severity, maintenance_priority} = classifyEfficiency(newEfficiency);
+  panel.efficiency = newEfficiency;
   panel.severity = severity;
   panel.maintenance_priority = maintenance_priority;
 }
@@ -148,19 +152,19 @@ let tickCount = 0;
 
 function runSimulation() {
 
-  console.log(`[SIM] Loaded ${PanelData?.length} panels. Starting...`);
+  console.log(`[SIM] Loaded ${PanelData.length} panels. Starting...`);
 
   setInterval(async function tick() {
     tickCount++;
 
-    for (const panel in PanelData) {
+    for (const panel of PanelData) {
       simulateDegradationFactors(panel);
     }
 
     await updateData();
     
     const counts = { Healthy: 0, "Minor Degradation": 0, "Moderate Degradation": 0, "Severe Degradation": 0 };
-      for (const panel in PanelData) {
+      for (const panel of PanelData) {
         counts[panel.severity]++;
       }
       console.log(`[SIM] Day ${tickCount}:`, counts);
@@ -171,8 +175,8 @@ function runSimulation() {
 }
 
 const updateData = async () => {
-  await fs.writeFile(filePath, JSON.stringify(PanelData ?? [], null, 2));
+  await fs.writeFile(filePath, JSON.stringify(PanelData, null, 2));
 };
 // Open connection
-connect();
+connectToStatistic();
 runSimulation();
