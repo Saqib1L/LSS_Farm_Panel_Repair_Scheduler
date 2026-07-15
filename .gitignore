@@ -6,4 +6,3 @@
 node_modules/
 
 # ignore data.json
-sources/data.json
