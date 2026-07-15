@@ -89,7 +89,5 @@ const sortPanels = async () => {
   let topWorstPanels = sortedPanels.slice(0, worstPanelLimit);
   
   // Displaying result to the terminal
-  console.log(`[RANK_PANEL]: Found 30 worst solar panel: `);
-  console.log(topWorstPanels);
   await saveTopWorstPanels(topWorstPanels);
 };
