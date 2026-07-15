@@ -7,7 +7,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const filePath = path.join(__dirname, '..', 'data.json');
+const filePath = path.join(__dirname, '..', 'sources', 'data.json');
 
 const totalData = 200000;
 

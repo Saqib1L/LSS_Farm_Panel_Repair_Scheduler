@@ -1,5 +1,5 @@
 import fs from 'fs/promises';
-const filePath = "../data.json";
+const filePath = "../sources/data.json";
 const totalData = 200000;
 
 const readData = async () => {

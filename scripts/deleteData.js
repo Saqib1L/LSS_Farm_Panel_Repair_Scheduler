@@ -1,4 +1,4 @@
 import { read } from 'fs';
 import fs from 'fs/promises';
-const filePath = "../data.json";
+const filePath = "../sources/data.json";
 fs.writeFile(filePath, JSON.stringify([], null, 2));
