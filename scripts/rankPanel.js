@@ -1,8 +1,14 @@
-// import { read } from 'fs';
-// import fs from 'fs/promises';
 import net from 'net';
 import readline from 'readline';
-// const filePath = "../data.json";
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __dirname =  path.dirname(fileURLToPath(import.meta.url));
+const outputPath = path.join(__dirname, '..', 'sources', 'main_queue.json');
+
+async function saveTopWorstPanels(topWorstPanels) {
+  await fs.writeFile(outputPath, JSON.stringify(topWorstPanels, null, 2));
+}
 
 // Retrieve data from data.json
 // const readData = async () => {
@@ -58,13 +64,12 @@ server.listen(PORT, HOST, () => {
   console.log("[RANK_PANEL][RECEIVER]: Receiver is listening on port ", PORT);
 });
 
-const sortPanels = () => {
+const sortPanels = async () => {
   // let panels = await readData();
   let sortedPanels = [...panels.values()].map(item => item.val);
   let totalPanels = sortedPanels.length;
   
   // partial bubble sort
-  
   for (let i = 0; i < worstPanelLimit && i < totalPanels; i++) {
     let swapped = false;
     
@@ -79,15 +84,12 @@ const sortPanels = () => {
         swapped = true;
       }
     }
-    
     if (!swapped) break;
   }
-  
-  
   let topWorstPanels = sortedPanels.slice(0, worstPanelLimit);
   
   // Displaying result to the terminal
   console.log(`[RANK_PANEL]: Found 30 worst solar panel: `);
   console.log(topWorstPanels);
-  // clearTimeout(updateTimer);
+  await saveTopWorstPanels(topWorstPanels);
 };
