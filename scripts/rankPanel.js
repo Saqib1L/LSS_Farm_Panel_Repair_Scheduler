@@ -29,20 +29,27 @@ const HOST = '127.0.0.1';
 
 // Receiving data from the other file
 let panels = new Map();
+let updateTimer = null;
 
 // Inter Process Communication (IPC)
 const server = net.createServer((socket) => {
   const rl = readline.createInterface({input: socket});
-
+  
   rl.on('line', (line) => {
     const batch = JSON.parse(line); // Received 5000 items
     for (const item of batch) {
+      // if(!updateTimer) updateTimer = setTimeout(sortPanels(), 1000);
       // Validate & Update
       if(item.id !== undefined) {
         panels.set(item.id, item);
       };
+      if(!updateTimer) {
+        updateTimer = setTimeout(() => {
+          sortPanels();
+          updateTimer = null;
+        }, 1000);
+      }
     };
-    sortPanels();
   });
   
 });
@@ -82,4 +89,5 @@ const sortPanels = () => {
   // Displaying result to the terminal
   console.log(`[RANK_PANEL]: Found 30 worst solar panel: `);
   console.log(topWorstPanels);
+  // clearTimeout(updateTimer);
 };
