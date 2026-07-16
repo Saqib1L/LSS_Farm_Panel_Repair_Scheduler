@@ -252,7 +252,7 @@ body {
     position: absolute;
     top: 24px;
     right: 24px;
-    width: 260px;
+    width: 320px;
     min-height: 88px;
     background: var(--color-surface-raised);
     border: 1px solid var(--color-border);
@@ -313,3 +313,122 @@ body {
     font-family: var(--font-mono);
     font-weight: 600;
 }
+
+.stats-card {
+  font-family: var(--font-body, system-ui, -apple-system, sans-serif);
+  background: var(--color-surface-raised, #1a2233);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  color: var(--color-text, #edeff3);
+}
+
+.stats-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+}
+
+.stats-card__header h2 {
+  margin: 0;
+  font-family: var(--font-display, inherit);
+  font-size: 1.25rem;
+}
+
+.status-badge {
+  background: rgba(255, 255, 255, 0.08); /* Default dark badge */
+  color: var(--color-text, #edeff3);
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: capitalize;
+}
+
+.stats-card__subtitle {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #8993a4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 20px 0 10px 0;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--color-text-muted, #8993a4);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-family: var(--font-mono, monospace);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text, #edeff3);
+}
+
+/* Flex & Grid Layouts */
+.stats-card__overview, .stats-card__extremes {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.stat-box, .extreme-box {
+  flex: 1;
+  background: var(--color-surface, #121826);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+}
+
+.stats-card__health-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.health-item {
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  background: var(--color-surface, #121826);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+}
+
+.health-value {
+  display: block;
+  font-family: var(--font-mono, monospace);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text, #edeff3);
+}
+
+/* Color Coding for Health (Matches your 0% badges in the sidebar) */
+.health-item.healthy { 
+  background: rgba(51, 214, 166, 0.12); 
+  color: var(--status-healthy, #33d6a6); 
+  border-color: rgba(51, 214, 166, 0.25); 
+}
+.health-item.minor { 
+  background: rgba(242, 201, 76, 0.12); 
+  color: var(--status-minor, #f2c94c); 
+  border-color: rgba(242, 201, 76, 0.25); 
+}
+.health-item.moderate { 
+  background: rgba(242, 153, 74, 0.12); 
+  color: var(--status-moderate, #f2994a); 
+  border-color: rgba(242, 153, 74, 0.25); 
+}
+.health-item.severe { 
+  background: rgba(235, 87, 87, 0.14); 
+  color: var(--status-severe, #eb5757); 
+  border-color: rgba(235, 87, 87, 0.25); 
+}
+
+.extreme-box.best { border-left: 4px solid var(--status-healthy, #33d6a6); }
+.extreme-box.worst { border-left: 4px solid var(--status-severe, #eb5757); }

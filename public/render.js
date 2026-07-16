@@ -3,21 +3,56 @@ const statsPanel        = document.getElementById('statsPanel');
 let zoneStream = null;
 let contentDisplayed = false;
 const statisticsContent = `
-  <div class="profile-card">
-    <h2>Grid informations: </h2>
-    <p id="panel_info_total"></p>
-    <p id="panel_info_healthy"></p>
-    <p id="panel_info_minor_degradated"></p>
-    <p id="panel_info_moderate_degradated"></p>
-    <p id="panel_info_severe_degradated"></p>
-    <p id="panel_info_worst_panel"></p>
-    <p id="panel_info_worst_panel_eff"></p>
-    <p id="panel_info_best_panel"></p>
-    <p id="panel_info_best_panel_eff"></p>
-    <p id="panel_info_status"></p>
-    <p id="panel_info_avg"></p>
+  <div class="stats-card">
+    <div class="stats-card__header">
+      <h2>Grid Information</h2>
+      <span id="panel_info_status" class="status-badge">--</span>
+    </div>
+
+    <div class="stats-card__overview">
+      <div class="stat-box">
+        <span class="stat-label">Total Panels</span>
+        <strong id="panel_info_total" class="stat-value">--</strong>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Grid Average</span>
+        <strong id="panel_info_avg" class="stat-value">--</strong>
+      </div>
+    </div>
+
+    <h3 class="stats-card__subtitle">Health Breakdown</h3>
+    <div class="stats-card__health-grid">
+      <div class="health-item healthy">
+        <span class="stat-label">Healthy</span>
+        <span id="panel_info_healthy" class="health-value">--</span>
+      </div>
+      <div class="health-item minor">
+        <span class="stat-label">Minor</span>
+        <span id="panel_info_minor_degradated" class="health-value">--</span>
+      </div>
+      <div class="health-item moderate">
+        <span class="stat-label">Moderate</span>
+        <span id="panel_info_moderate_degradated" class="health-value">--</span>
+      </div>
+      <div class="health-item severe">
+        <span class="stat-label">Severe</span>
+        <span id="panel_info_severe_degradated" class="health-value">--</span>
+      </div>
+    </div>
+
+    <h3 class="stats-card__subtitle">Performance Extremes</h3>
+    <div class="stats-card__extremes">
+      <div class="extreme-box best">
+        <span class="stat-label">Best Panel: <span id="panel_info_best_panel">--</span></span>
+        <strong class="stat-value"><span id="panel_info_best_panel_eff">--</span>%</strong>
+      </div>
+      <div class="extreme-box worst">
+        <span class="stat-label">Worst Panel: <span id="panel_info_worst_panel">--</span></span>
+        <strong class="stat-value"><span id="panel_info_worst_panel_eff">--</span>%</strong>
+      </div>
+    </div>
   </div>
-    `.replace(/\n/g, '').trim();
+`.replace(/\n/g, '').trim();
     // Removing newlines from the HTML string so it doesn't break the SSE format
 
 const defaultContent = `
@@ -41,17 +76,17 @@ function openZoneStream(zoneId) {
   zoneStream.onmessage = (event) => {
       const data = JSON.parse(event.data);
       // statsPanel.innerHTML = event.data;
-      gridInfoTotal.innerText     = `Total: ${data.total}`;
-      gridInfoHealthy.innerText   = `Healthy: ${data.prior_none}`;
-      gridInfoMinor.innerText     = `Minor: ${data.prior_low}`;
-      gridInfoModerate.innerText  = `Moderate: ${data.prior_med}`;
-      gridInfoSevere.innerText    = `Severe: ${data.prior_high}`;
-      gridWorstPanel.innerText    = `Worst panel: ${data.worst_panel}`;
-      gridWorstPanelEff.innerText = `Worst panel %:${data.worst_panel_eff}`;
-      gridBestPanel.innerText     = `Best panel: ${data.best_panel}`;
-      gridBestPanelEff.innerText  = `Best panel %: ${data.best_panel_eff}`;
-      gridInfoStatus.innerText    = `Grid status: ${data.status}`;
-      gridInfoAvg.innerText       = `Average %: ${data.average}`;
+      gridInfoTotal.innerText     = `${data.total}`;
+      gridInfoHealthy.innerText   = `${data.prior_none}`;
+      gridInfoMinor.innerText     = `${data.prior_low}`;
+      gridInfoModerate.innerText  = `${data.prior_med}`;
+      gridInfoSevere.innerText    = `${data.prior_high}`;
+      gridWorstPanel.innerText    = `${data.worst_panel}`;
+      gridWorstPanelEff.innerText = `${data.worst_panel_eff}`;
+      gridBestPanel.innerText     = `${data.best_panel}`;
+      gridBestPanelEff.innerText  = `${data.best_panel_eff}`;
+      gridInfoStatus.innerText    = `${data.status}`;
+      gridInfoAvg.innerText       = `${data.average.toFixed(3)}`;
   };
 }
 
