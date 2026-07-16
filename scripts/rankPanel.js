@@ -88,6 +88,6 @@ const sortPanels = async () => {
   }
   let topWorstPanels = sortedPanels.slice(0, worstPanelLimit);
   
-  // Displaying result to the terminal
+  // Rewriting the result to the main_queue.json
   await saveTopWorstPanels(topWorstPanels);
 };

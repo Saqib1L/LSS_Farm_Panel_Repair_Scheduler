@@ -41,23 +41,21 @@ app.get('/clicked/:id', (req, res) => {
   });
 
   // SSE requires data to be prefixed with "data: " and end with two newlines
-  // Removing newlines from the HTML string so it doesn't break the SSE format
-  const sendUpdate = () => {
-    const htmlContent = `
-      <div class="profile-card" id="sse-wrapper-${id}">
-          <h2>Grid informations: </h2>
-          <p>Grid ID = ${id}</p>
-          <p>Number of panels = </p>
-          <p>Healthy panels = </p>
-          <p>Minor degradated panels = </p>
-          <p>Moderate degradated panels = </p>
-          <p>Severe degradated panels = </p>
-          <p>Worst panel = </p>
-          <p>Best panel  = </p>
-      </div>
-    `;
-    const cleanHtml = htmlContent.replace(/\n/g, '').trim();
-    res.write(`data: ${cleanHtml}\n\n`);
+  const sendUpdate = async () => {    
+    try {
+      const gridData = await fs.readFile(path.join(__dirname, '..', 'sources', 'statistics.json'), 'utf8');
+      const gridInfo = (JSON.parse(gridData)).find(grid => grid.zone == id);
+      
+      // Safety check: Only send if the zone actually exists
+      if (gridInfo) {
+        res.write(`data: ${JSON.stringify(gridInfo)}\n\n`);
+      } else {
+        // Send a controlled error object instead of 'undefined'
+        res.write(`data: ${JSON.stringify({ error: "Zone not found" })}\n\n`);
+      }
+    } catch (error) {
+      console.error("Error reading statistics.json:", error);
+    }
   }
 
   const updateEverySecond = setInterval(() => {
