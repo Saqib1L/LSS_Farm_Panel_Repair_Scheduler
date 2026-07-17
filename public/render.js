@@ -1,6 +1,8 @@
 const panelGrid         = document.getElementById('panelGrid');
 const statsPanel        = document.getElementById('statsPanel');
 let zoneStream = null;
+let fetchStream = null;
+let activeZone = null;
 let contentDisplayed = false;
 const statisticsContent = `
   <div class="stats-card">
@@ -63,7 +65,41 @@ const defaultContent = `
 <p class="stats-panel__placeholder">Select a zone to view statistics</p>
 `.replace(/\n/g, '').trim();
 
-function openZoneStream(zoneId) {
+// function openZoneStream(zoneId) {
+//   const gridInfoTotal     = document.getElementById('panel_info_total');
+//   const gridInfoHealthy   = document.getElementById('panel_info_healthy');
+//   const gridInfoMinor     = document.getElementById('panel_info_minor_degradated');
+//   const gridInfoModerate  = document.getElementById('panel_info_moderate_degradated');
+//   const gridInfoSevere    = document.getElementById('panel_info_severe_degradated');
+//   const gridWorstPanel    = document.getElementById('panel_info_worst_panel');
+//   const gridWorstPanelEff = document.getElementById('panel_info_worst_panel_eff');
+//   const gridBestPanel     = document.getElementById('panel_info_best_panel');
+//   const gridBestPanelEff  = document.getElementById('panel_info_best_panel_eff');
+//   const gridInfoStatus    = document.getElementById('panel_info_status');
+//   const gridInfoAvg       = document.getElementById('panel_info_avg');
+//   const gridZone          = document.getElementById('grid_zone');
+//   if (zoneStream) zoneStream.close();
+//   zoneStream = new EventSource(`http://localhost:3000/clicked/${zoneId}`);
+//   zoneStream.onmessage = (event) => {
+//     const data = JSON.parse(event.data);
+//     // statsPanel.innerHTML = event.data;
+//     gridInfoTotal.innerText     = `${data.total}`;
+//     gridInfoHealthy.innerText   = `${data.prior_none}`;
+//     gridInfoMinor.innerText     = `${data.prior_low}`;
+//     gridInfoModerate.innerText  = `${data.prior_med}`;
+//     gridInfoSevere.innerText    = `${data.prior_high}`;
+//     gridWorstPanel.innerText    = `${data.worst_panel}`;
+//     gridWorstPanelEff.innerText = `${data.worst_panel_eff}`;
+//     gridBestPanel.innerText     = `${data.best_panel}`;
+//     gridBestPanelEff.innerText  = `${data.best_panel_eff}`;
+//     gridInfoStatus.innerText    = `${data.status}`;
+//     gridInfoAvg.innerText       = `${data.average.toFixed(3)}`;
+//     gridZone.innerText          = `${data.zone}`;
+//   };
+// }
+
+// Updating stats information 
+function updateStatsInformation(grid) {
   const gridInfoTotal     = document.getElementById('panel_info_total');
   const gridInfoHealthy   = document.getElementById('panel_info_healthy');
   const gridInfoMinor     = document.getElementById('panel_info_minor_degradated');
@@ -76,36 +112,48 @@ function openZoneStream(zoneId) {
   const gridInfoStatus    = document.getElementById('panel_info_status');
   const gridInfoAvg       = document.getElementById('panel_info_avg');
   const gridZone          = document.getElementById('grid_zone');
-  if (zoneStream) zoneStream.close();
-  zoneStream = new EventSource(`http://localhost:3000/clicked/${zoneId}`);
-  zoneStream.onmessage = (event) => {
+  gridInfoTotal.innerText     = `${grid.total}`;
+  gridInfoHealthy.innerText   = `${grid.prior_none}`;
+  gridInfoMinor.innerText     = `${grid.prior_low}`;
+  gridInfoModerate.innerText  = `${grid.prior_med}`;
+  gridInfoSevere.innerText    = `${grid.prior_high}`;
+  gridWorstPanel.innerText    = `${grid.worst_panel}`;
+  gridWorstPanelEff.innerText = `${grid.worst_panel_eff}`;
+  gridBestPanel.innerText     = `${grid.best_panel}`;
+  gridBestPanelEff.innerText  = `${grid.best_panel_eff}`;
+  gridInfoStatus.innerText    = `${grid.status}`;
+  gridInfoAvg.innerText       = `${grid.average.toFixed(3)}`;
+  gridZone.innerText          = `${grid.zone}`;
+}
+
+
+// Fetching grids information from server.js (BACKEND)
+function fetchGrids() {
+  if(fetchStream) fetchStream.close();
+  fetchStream = new EventSource("http://localhost:3000/retrieve-grids");
+  fetchStream.onmessage = (event) => {
     const data = JSON.parse(event.data);
-    // statsPanel.innerHTML = event.data;
-    gridInfoTotal.innerText     = `${data.total}`;
-    gridInfoHealthy.innerText   = `${data.prior_none}`;
-    gridInfoMinor.innerText     = `${data.prior_low}`;
-    gridInfoModerate.innerText  = `${data.prior_med}`;
-    gridInfoSevere.innerText    = `${data.prior_high}`;
-    gridWorstPanel.innerText    = `${data.worst_panel}`;
-    gridWorstPanelEff.innerText = `${data.worst_panel_eff}`;
-    gridBestPanel.innerText     = `${data.best_panel}`;
-    gridBestPanelEff.innerText  = `${data.best_panel_eff}`;
-    gridInfoStatus.innerText    = `${data.status}`;
-    gridInfoAvg.innerText       = `${data.average.toFixed(3)}`;
-    gridZone.innerText          = `${data.zone}`;
-  };
+    for(let grid of data) {
+      document.getElementById(`${grid.zone}`).setAttribute('data-status', `${grid.status}`);
+      if(contentDisplayed && grid.zone === activeZone) {
+        updateStatsInformation(grid);
+      }
+    }
+  }
 }
 
 // Event delegation: one listener covers all 400 cells, and any future
 // cells re-rendered by PanelGridView.render() work without rebinding.
+
+// Clicking on panel grid to reveal the window of grids stats
 panelGrid.addEventListener('click', (event) => {
   if(!contentDisplayed) {
     statsPanel.innerHTML = statisticsContent;
     contentDisplayed = !contentDisplayed;
   }
   const cell = event.target.closest('.panel-grid__cell');
+  activeZone = cell.dataset.zoneId;
   if (!cell) return;
-  openZoneStream(cell.dataset.zoneId);
 });
 
 panelGrid.addEventListener('keydown', (event) => {
@@ -113,7 +161,6 @@ panelGrid.addEventListener('keydown', (event) => {
   const cell = event.target.closest('.panel-grid__cell');
   if (!cell) return;
   event.preventDefault();
-  openZoneStream(cell.dataset.zoneId);
 });
 
 // Delegated close button lives inside server-streamed HTML, so it must
@@ -124,7 +171,7 @@ statsPanel.addEventListener('click', (event) => {
   contentDisplayed = !contentDisplayed;
 });
 
-
+// Close button callback to close the stats window (UI)
 function closeWindow(event) {
   if (!event.target.matches('.stats-panel__close')) return;
   if (zoneStream) zoneStream.close();
@@ -204,6 +251,12 @@ function generateTemplate() {
   panelGrid.innerHTML = htmlContent;
 }
 
-generateTemplate();
-updateMaintenanceQueue();
-setInterval(updateMaintenanceQueue, 1000);
+function startProgram() {
+  generateTemplate();
+  fetchGrids();
+  updateMaintenanceQueue();
+  setInterval(updateMaintenanceQueue, 1000);
+}
+
+
+startProgram();

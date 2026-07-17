@@ -30,22 +30,58 @@ app.get('/maintenance-queue', async (req, res) => {
   }
 });
 
-app.get('/clicked/:id', (req, res) => {
-  const id = req.params.id;
+// app.get('/clicked/:id', (req, res) => {
+//   const id = req.params.id;
   
-  // HTTP headers for SSE connection
+//   // HTTP headers for SSE connection
+//   res.writeHead(200, {
+//     'content-type': 'text/event-stream',
+//     'cache-control': 'no-cache',
+//     'connection': 'keep-alive'
+//   });
+
+//   // SSE requires data to be prefixed with "data: " and end with two newlines
+//   const sendUpdate = async () => {    
+//     try {
+//       const gridData = await fs.readFile(path.join(__dirname, '..', 'sources', 'statistics.json'), 'utf8');
+//       const gridInfo = (JSON.parse(gridData)).find(grid => grid.zone == id);
+      
+//       // Safety check: Only send if the zone actually exists
+//       if (gridInfo) {
+//         res.write(`data: ${JSON.stringify(gridInfo)}\n\n`);
+//       } else {
+//         // Send a controlled error object instead of 'undefined'
+//         res.write(`data: ${JSON.stringify({ error: "Zone not found" })}\n\n`);
+//       }
+//     } catch (error) {
+//       console.error("Error reading statistics.json:", error);
+//     }
+//   }
+
+//   const updateEverySecond = setInterval(() => {
+//     sendUpdate();
+//     console.log(`The content for id ${id} is updating for every 1 second`);
+//   }, 1000);
+
+//   req.on('close', () => {
+//     console.log(`Connection closed for grid id: ${id}`)
+//     clearInterval(updateEverySecond);
+//     res.end();
+//   });
+// });
+
+app.get('/retrieve-grids', (req, res) => {
+    // HTTP headers for SSE connection
   res.writeHead(200, {
     'content-type': 'text/event-stream',
     'cache-control': 'no-cache',
     'connection': 'keep-alive'
   });
-
-  // SSE requires data to be prefixed with "data: " and end with two newlines
+    // SSE requires data to be prefixed with "data: " and end with two newlines
   const sendUpdate = async () => {    
     try {
       const gridData = await fs.readFile(path.join(__dirname, '..', 'sources', 'statistics.json'), 'utf8');
-      const gridInfo = (JSON.parse(gridData)).find(grid => grid.zone == id);
-      
+      const gridInfo = JSON.parse(gridData);
       // Safety check: Only send if the zone actually exists
       if (gridInfo) {
         res.write(`data: ${JSON.stringify(gridInfo)}\n\n`);
@@ -60,11 +96,11 @@ app.get('/clicked/:id', (req, res) => {
 
   const updateEverySecond = setInterval(() => {
     sendUpdate();
-    console.log(`The content for id ${id} is updating for every 1 second`);
+    console.log(`Every content of grids are updated for every 1 second`);
   }, 1000);
 
   req.on('close', () => {
-    console.log(`Connection closed for grid id: ${id}`)
+    console.log(`Connection closed for every grids`)
     clearInterval(updateEverySecond);
     res.end();
   });
