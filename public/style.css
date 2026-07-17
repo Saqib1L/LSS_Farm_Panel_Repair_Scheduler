@@ -230,10 +230,10 @@ body {
 }
 
 /* Each zone carries one data-status value; color follows automatically. */
-.panel-grid__cell[data-status="healthy"] { background: rgba(51, 214, 166, .18); }
-.panel-grid__cell[data-status="minor"] { background: rgba(242, 201, 76, .35); }
-.panel-grid__cell[data-status="moderate"] { background: rgba(242, 153, 74, .55); }
-.panel-grid__cell[data-status="severe"] {
+.panel-grid__cell[data-status="Healthy"] { background: rgba(51, 214, 166, .18); }
+.panel-grid__cell[data-status="Minor Degradation"] { background: rgba(242, 201, 76, .35); }
+.panel-grid__cell[data-status="Moderate Degradation"] { background: rgba(242, 153, 74, .55); }
+.panel-grid__cell[data-status="Severe Degradation"] {
     background: rgba(235, 87, 87, .7);
     animation: pulse-severe 2.2s ease-in-out infinite;
 }
@@ -446,4 +446,10 @@ body {
     height: 42px;
     background-color: crimson;
     cursor: pointer;
+}
+
+#panelGrid {
+    display: grid;
+    grid-template-columns: repeat(20, 1fr);
+    gap: 8px;
 }

@@ -79,20 +79,20 @@ function openZoneStream(zoneId) {
   if (zoneStream) zoneStream.close();
   zoneStream = new EventSource(`http://localhost:3000/clicked/${zoneId}`);
   zoneStream.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      // statsPanel.innerHTML = event.data;
-      gridInfoTotal.innerText     = `${data.total}`;
-      gridInfoHealthy.innerText   = `${data.prior_none}`;
-      gridInfoMinor.innerText     = `${data.prior_low}`;
-      gridInfoModerate.innerText  = `${data.prior_med}`;
-      gridInfoSevere.innerText    = `${data.prior_high}`;
-      gridWorstPanel.innerText    = `${data.worst_panel}`;
-      gridWorstPanelEff.innerText = `${data.worst_panel_eff}`;
-      gridBestPanel.innerText     = `${data.best_panel}`;
-      gridBestPanelEff.innerText  = `${data.best_panel_eff}`;
-      gridInfoStatus.innerText    = `${data.status}`;
-      gridInfoAvg.innerText       = `${data.average.toFixed(3)}`;
-      gridZone.innerText          = `${data.zone}`;
+    const data = JSON.parse(event.data);
+    // statsPanel.innerHTML = event.data;
+    gridInfoTotal.innerText     = `${data.total}`;
+    gridInfoHealthy.innerText   = `${data.prior_none}`;
+    gridInfoMinor.innerText     = `${data.prior_low}`;
+    gridInfoModerate.innerText  = `${data.prior_med}`;
+    gridInfoSevere.innerText    = `${data.prior_high}`;
+    gridWorstPanel.innerText    = `${data.worst_panel}`;
+    gridWorstPanelEff.innerText = `${data.worst_panel_eff}`;
+    gridBestPanel.innerText     = `${data.best_panel}`;
+    gridBestPanelEff.innerText  = `${data.best_panel_eff}`;
+    gridInfoStatus.innerText    = `${data.status}`;
+    gridInfoAvg.innerText       = `${data.average.toFixed(3)}`;
+    gridZone.innerText          = `${data.zone}`;
   };
 }
 
@@ -185,6 +185,23 @@ function generateTemplate() {
     `;
   }
   maintenanceQueueList.innerHTML = htmlContent;
+
+  htmlContent = "";
+  let ROW = 1;
+  let COL = 1;
+  for(let i=0;i<400;i++) {
+    htmlContent += `
+      <div id="ZONE-R${ROW}-C${COL}" class="panel-grid__cell" data-row="0" data-col="0" data-zone-id="ZONE-R${ROW}-C${COL}" tabindex="0" role="button" aria-label="Zone R${ROW}-C${COL}">
+      </div>
+    `;
+    if(COL >= 20) {
+      COL = 0;
+      ROW++;
+    }
+    COL++;
+  }
+
+  panelGrid.innerHTML = htmlContent;
 }
 
 generateTemplate();
