@@ -6,6 +6,7 @@ const statisticsContent = `
   <div class="stats-card">
     <div class="stats-card__header">
       <h2>Grid Information</h2>
+      <span class="stat-label">Zone: <span id="grid_zone">--</span></span>
       <span id="panel_info_status" class="status-badge">--</span>
     </div>
 
@@ -51,6 +52,9 @@ const statisticsContent = `
         <strong class="stat-value"><span id="panel_info_worst_panel_eff">--</span>%</strong>
       </div>
     </div>
+    <button id="close-btn-statistic-info" onClick="closeWindow(event)" class="stats-panel__close">
+      ✖
+    </button>
   </div>
 `.replace(/\n/g, '').trim();
     // Removing newlines from the HTML string so it doesn't break the SSE format
@@ -71,6 +75,7 @@ function openZoneStream(zoneId) {
   const gridBestPanelEff  = document.getElementById('panel_info_best_panel_eff');
   const gridInfoStatus    = document.getElementById('panel_info_status');
   const gridInfoAvg       = document.getElementById('panel_info_avg');
+  const gridZone          = document.getElementById('grid_zone');
   if (zoneStream) zoneStream.close();
   zoneStream = new EventSource(`http://localhost:3000/clicked/${zoneId}`);
   zoneStream.onmessage = (event) => {
@@ -87,6 +92,7 @@ function openZoneStream(zoneId) {
       gridBestPanelEff.innerText  = `${data.best_panel_eff}`;
       gridInfoStatus.innerText    = `${data.status}`;
       gridInfoAvg.innerText       = `${data.average.toFixed(3)}`;
+      gridZone.innerText          = `${data.zone}`;
   };
 }
 
@@ -95,7 +101,7 @@ function openZoneStream(zoneId) {
 panelGrid.addEventListener('click', (event) => {
   if(!contentDisplayed) {
     statsPanel.innerHTML = statisticsContent;
-    contentDisplayed = true;
+    contentDisplayed = !contentDisplayed;
   }
   const cell = event.target.closest('.panel-grid__cell');
   if (!cell) return;
@@ -115,10 +121,15 @@ panelGrid.addEventListener('keydown', (event) => {
 statsPanel.addEventListener('click', (event) => {
   if (!event.target.matches('.stats-panel__close')) return;
   if (zoneStream) zoneStream.close();
-  statsPanel.innerHTML = defaultContent;
+  contentDisplayed = !contentDisplayed;
 });
 
 
+function closeWindow(event) {
+  if (!event.target.matches('.stats-panel__close')) return;
+  if (zoneStream) zoneStream.close();
+  statsPanel.innerHTML = defaultContent;
+};
 
 async function fetchMaintenanceQueue() {
   const response = await fetch('/maintenance-queue');
@@ -139,13 +150,6 @@ async function updateMaintenanceQueue() {
   topPanels.forEach((panel, index) => {
     renderMaintenanceItem(panel, index+1);
   });
-  // let htmlContent = "";
-
-  // topPanels.forEach((panel, index) => {
-  //   htmlContent += renderMaintenanceItem(panel, index + 1);
-  // });
-
-  // document.getElementById('maintenanceQueueList').innerHTML = htmlContent;
 }
 
 function renderMaintenanceItem(panel, rank) {

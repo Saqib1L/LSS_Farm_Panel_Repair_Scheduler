@@ -325,6 +325,7 @@ body {
 
 .stats-card__header {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
@@ -432,3 +433,17 @@ body {
 
 .extreme-box.best { border-left: 4px solid var(--status-healthy, #33d6a6); }
 .extreme-box.worst { border-left: 4px solid var(--status-severe, #eb5757); }
+
+#close-btn-statistic-info {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 24px;
+    color: #fff;
+    border: none;
+    border-radius: 64px;
+    width: 42px;
+    height: 42px;
+    background-color: crimson;
+    cursor: pointer;
+}
