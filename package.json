@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start-all": "concurrently \"(cd ./scripts/ && node server.js)\" \"(cd ./scripts/ && node panelsimulation.js)\" \"(cd ./scripts/ && node rankpanel.js)\" \"(cd ./scripts/ && node statistics.js)\"",
-    "start-stream": "concurrently \"(cd ./scripts/ && node panelsimulation.js)\" \"(cd ./scripts/ && node statistics.js)\" \"(cd ./scripts/ && node rankpanel.js)\""
+    "start-stream": "concurrently \"(cd ./scripts/ && node panelsimulation.js)\" \"(cd ./scripts/ && node statistics.js)\" \"(cd ./scripts/ && node rankpanel.js)\"",
+    "restart-data": "cd ./scripts/ && node deletedata.js && node datagenscript.js" 
   },
   "repository": {
     "type": "git",
