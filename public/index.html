@@ -14,8 +14,10 @@
 
     <header class="site-header">
         <h1 class="site-header__title">Solar Farm Monitoring System</h1>
-
-        <!-- Populated by FarmSummaryView.render(totals) -->
+        <div class="loss-indicator">
+            <span class="loss-indicator__label">Estimated Loss</span>
+            <span class="loss-indicator__value"><span id="summaryLoss">RM 0.00</span><span class="loss-indicator__unit">/day</span></span>
+        </div>
         <div class="site-header__summary" id="farmSummary">
             <div class="summary-pill summary-pill--healthy">
                 <span class="summary-pill__dot"></span>

@@ -72,6 +72,38 @@ body {
     flex-wrap: wrap;
 }
 
+.loss-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 4px 16px;
+    border-left: 1px solid var(--color-border);
+}
+
+.loss-indicator__label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+}
+
+.loss-indicator__value {
+    font-family: var(--font-mono);
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--status-severe);
+    line-height: 1.2;
+}
+
+.loss-indicator__unit {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-left: 4px;
+}
+
 .summary-pill {
     display: flex;
     align-items: center;
@@ -95,7 +127,8 @@ body {
 
 .summary-pill__label {
     font-family: var(--font-mono);
-    font-size: 0.65rem;
+    font-size: 0.7rem;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--color-text-muted);
@@ -103,8 +136,8 @@ body {
 
 .summary-pill__value {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 0.85rem;
+    font-weight: 700;
     color: var(--color-text);
 }
 
