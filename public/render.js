@@ -1,52 +1,8 @@
-const LOSS_RATE_HEALTHY = 0.00;
-const LOSS_RATE_MINOR = 0.50;
-const LOSS_RATE_MODERATE = 2.00;
-const LOSS_RATE_SEVERE = 5.00;
-
-function calculateFarmSummary(data) {
-  let totalHealthy = 0;
-  let totalMinor = 0;
-  let totalModerate = 0;
-  let totalSevere = 0;
-
-  for (let grid of data) {
-    totalHealthy += grid.prior_none;
-    totalMinor += grid.prior_low;
-    totalModerate += grid.prior_med;
-    totalSevere += grid.prior_high;
-  }
-
-  // I included Loss Rate for healthy even though it's equal to 0 (just for readibility and logical reasons)
-  let totalLoss = (LOSS_RATE_HEALTHY * totalHealthy) 
-                + (LOSS_RATE_MINOR * totalMinor) 
-                + (LOSS_RATE_MODERATE * totalModerate) 
-                + (LOSS_RATE_SEVERE * totalSevere);
-
-  return {
-    healthy: totalHealthy,
-    minor: totalMinor,
-    moderate: totalModerate,
-    severe: totalSevere,
-    loss: totalLoss
-  };
-}
-
-async function populateFarmSummary(data) {
-  const summaryHealthy = document.getElementById('summaryHealthy');
-  const summaryMinor = document.getElementById('summaryMinor');
-  const summaryModerate = document.getElementById('summaryModerate');
-  const summarySevere = document.getElementById('summarySevere');
-  const summaryLoss = document.getElementById('summaryLoss');
-
-  const totals = calculateFarmSummary(data);
-
-  summaryHealthy.innerText = totals.healthy;
-  summaryMinor.innerText = totals.minor;
-  summaryModerate.innerText = totals.moderate;
-  summarySevere.innerText = totals.severe;
-  summaryLoss.innerText = `RM ${totals.loss.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
-
+const summaryHealthy               = document.getElementById('summaryHealthy');
+const summaryMinor                 = document.getElementById('summaryMinor');
+const summaryModerate              = document.getElementById('summaryModerate');
+const summarySevere                = document.getElementById('summarySevere');
+const summaryLoss                  = document.getElementById('summaryLoss');
 const panelGrid                    = document.getElementById('panelGrid');
 const statsPanel                   = document.getElementById('statsPanel');
 const [closeButton1, closeButton2] = document.querySelectorAll('.close-button');
@@ -59,10 +15,15 @@ const repairButton                 = document.querySelector('.repair-button');
 const successMessageBox            = document.getElementById('success-toast');
 const toastMessage                 = document.getElementById('toast-message');
 const toastCloseButton             = document.getElementById('close-toast');
+const LOSS_RATE_HEALTHY            = 0.00;
+const LOSS_RATE_MINOR              = 0.50;
+const LOSS_RATE_MODERATE           = 2.00;
+const LOSS_RATE_SEVERE             = 5.00;
 let   zoneStream                   = null;
 let   fetchStream                  = null;
 let   activeZone                   = null;
 let   contentDisplayed             = false;
+let   setDebounce                  = null;
 const statisticsContent            = `
   <div class="stats-card">
     <div class="stats-card__header">
@@ -124,6 +85,44 @@ const defaultContent = `
 <p class="stats-panel__placeholder">Select a zone to view statistics</p>
 `.replace(/\n/g, '').trim();
 
+// ========= Functions ========= //
+function calculateFarmSummary(data) {
+  let totalHealthy = 0;
+  let totalMinor = 0;
+  let totalModerate = 0;
+  let totalSevere = 0;
+
+  for (let grid of data) {
+    totalHealthy += grid.prior_none;
+    totalMinor += grid.prior_low;
+    totalModerate += grid.prior_med;
+    totalSevere += grid.prior_high;
+  }
+
+  // I included Loss Rate for healthy even though it's equal to 0 (just for readibility and logical reasons)
+  let totalLoss = (LOSS_RATE_HEALTHY * totalHealthy) 
+                + (LOSS_RATE_MINOR * totalMinor) 
+                + (LOSS_RATE_MODERATE * totalModerate) 
+                + (LOSS_RATE_SEVERE * totalSevere);
+
+  return {
+    healthy: totalHealthy,
+    minor: totalMinor,
+    moderate: totalModerate,
+    severe: totalSevere,
+    loss: totalLoss
+  };
+}
+
+async function populateFarmSummary(data) {
+  const totals = calculateFarmSummary(data);
+  summaryHealthy.innerText  = totals.healthy;
+  summaryMinor.innerText    = totals.minor;
+  summaryModerate.innerText = totals.moderate;
+  summarySevere.innerText   = totals.severe;
+  summaryLoss.innerText     = `RM ${totals.loss.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
 // Updating stats information 
 function updateStatsInformation(grid) {
   const gridInfoTotal     = document.getElementById('panel_info_total');
@@ -152,7 +151,6 @@ function updateStatsInformation(grid) {
   gridZone.innerText          = `${grid.zone}`;
 }
 
-
 // Fetching grids information from server.js (BACKEND)
 function fetchGrids() {
   if(fetchStream) fetchStream.close();
@@ -169,80 +167,18 @@ function fetchGrids() {
   }
 }
 
-// Event delegation: one listener covers all 400 cells, and any future
-// cells re-rendered by PanelGridView.render() work without rebinding.
-
-// Clicking on panel grid to reveal the window of grids stats
-panelGrid.addEventListener('click', (event) => {
-  if(!contentDisplayed) {
-    statsPanel.innerHTML = statisticsContent;
-    contentDisplayed = !contentDisplayed;
-  }
-  const cell = event.target.closest('.panel-grid__cell');
-  activeZone = cell.dataset.zoneId;
-  if (!cell) return;
-});
-
-panelGrid.addEventListener('keydown', (event) => {
-  if (event.key !== 'Enter' && event.key !== ' ') return;
-  const cell = event.target.closest('.panel-grid__cell');
-  if (!cell) return;
-  event.preventDefault();
-});
-
-// Delegated close button lives inside server-streamed HTML, so it must
-// be bound on the stable parent rather than the replaced innerHTML.
-statsPanel.addEventListener('click', (event) => {
-  if (!event.target.matches('.stats-panel__close')) return;
-  if (zoneStream) zoneStream.close();
-  contentDisplayed = !contentDisplayed;
-});
-
 // Open pop-up form
 function openPopupForm() {
-  panelInputID.value = "";
+  panelInputID.value              = "";
   panelInputDescription.innerText = "";
   currentDegradationBar.innerText = "No panel found";
   repairFormView.classList.toggle('close-popup-form', false);
 }
-generateFormRepairButton.addEventListener('click', () => openPopupForm());
-
 
 // Close button for pop-up form
 function closePopupForm() {
   repairFormView.classList.toggle('close-popup-form', true);
 }
-closeButton1.addEventListener('click', () => closePopupForm());
-closeButton2.addEventListener('click', () => closePopupForm());
-
-
-// Retrieving input from html tag input and fetching the data from back-end
-let setDebounce = null;
-panelInputID.addEventListener('input', () => {
-  if(setDebounce) {
-    clearTimeout(setDebounce);
-  };
-  setDebounce = setTimeout(async () => {
-    try {
-      console.log(`INPUT VAL: ${panelInputID.value}`);
-      const response = await fetch(`/api/repair-panel/${panelInputID.value || '-'}`);
-      if(response.ok) {
-        const panelData = await response.json();
-        repairButton.disabled = false;
-        if(panelData.error) {
-          currentDegradationBar.innerText = "No panel found";
-          repairButton.disabled = true;
-          throw new Error();
-        }
-        currentDegradationBar.innerText = `${panelData.efficiency}% - ${panelData.severity}`;
-        return;
-      };
-    }
-    catch(error) {
-      console.log(`ERROR: panel not found`);
-    }
-  }, 600);
-});
 
 // Successfull message popup
 function showMessage(panelId) {
@@ -251,25 +187,6 @@ function showMessage(panelId) {
 };
 
 function closeMessage() { successMessageBox.classList.toggle('show', false) };
-
-
-// Initiate repair
-repairButton.addEventListener('click', async () => {
-  try {
-    const response = await fetch(`/api/fix-panel/${panelInputID.value}`);
-    closePopupForm(panelInputID.value);
-    showMessage(parseInt((panelInputID.value).replace(/\D/g, '')));
-    // console.log(await response.json());
-  } catch (error) {
-    console.log("Error: ", error);
-  }
-});
-
-// Close message popup box
-toastCloseButton.addEventListener('click', () => {
-  closeMessage();
-});
-
 
 // Close button callback to close the stats window (UI)
 function closeWindow(event) {
@@ -302,13 +219,13 @@ async function updateMaintenanceQueue() {
 }
 
 function renderMaintenanceItem(panel, rank) {
-  const status = severityToStatus(panel.severity);
-  const maintenanceRank = document.getElementById(`maintenance_rank_id_${rank}`);
-  const maintenancePanelID = document.getElementById(`maintenance_panel_id_${rank}`);
+  const status                = severityToStatus(panel.severity);
+  const maintenanceRank       = document.getElementById(`maintenance_rank_id_${rank}`);
+  const maintenancePanelID    = document.getElementById(`maintenance_panel_id_${rank}`);
   const maintenanceEfficiency = document.getElementById(`maintenance_efficiency_id_${rank}`);
   maintenanceEfficiency.setAttribute('data-status', `${status}`);
-  maintenanceRank.innerText = `#${rank}`;
-  maintenancePanelID.innerText = `Panel ${panel.id}`;
+  maintenanceRank.innerText       = `#${rank}`;
+  maintenancePanelID.innerText    = `Panel ${panel.id}`;
   maintenanceEfficiency.innerText = `${panel.efficiency}%`;
 }
     
@@ -340,7 +257,6 @@ function generateTemplate() {
     }
     COL++;
   }
-
   panelGrid.innerHTML = htmlContent;
 }
 
@@ -351,5 +267,81 @@ function startProgram() {
   setInterval(updateMaintenanceQueue, 1000);
 }
 
+
+// ========= Add Event Listiner ========= //
+// Clicking on panel grid to reveal the window of grids stats
+panelGrid.addEventListener('click', (event) => {
+  if(!contentDisplayed) {
+    statsPanel.innerHTML = statisticsContent;
+    contentDisplayed = !contentDisplayed;
+  }
+  const cell = event.target.closest('.panel-grid__cell');
+  activeZone = cell.dataset.zoneId;
+  if (!cell) return;
+});
+
+panelGrid.addEventListener('keydown', (event) => {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  const cell = event.target.closest('.panel-grid__cell');
+  if (!cell) return;
+  event.preventDefault();
+});
+
+// Delegated close button lives inside server-streamed HTML, so it must
+// be bound on the stable parent rather than the replaced innerHTML.
+statsPanel.addEventListener('click', (event) => {
+  if (!event.target.matches('.stats-panel__close')) return;
+  if (zoneStream) zoneStream.close();
+  contentDisplayed = !contentDisplayed;
+});
+
+generateFormRepairButton.addEventListener('click', () => openPopupForm());
+
+closeButton1.addEventListener('click', () => closePopupForm());
+closeButton2.addEventListener('click', () => closePopupForm());
+
+// Retrieving input from html tag input and fetching the data from back-end
+panelInputID.addEventListener('input', () => {
+  if(setDebounce) {
+    clearTimeout(setDebounce);
+  };
+  setDebounce = setTimeout(async () => {
+    try {
+      console.log(`INPUT VAL: ${panelInputID.value}`);
+      const response = await fetch(`/api/repair-panel/${panelInputID.value || '-'}`);
+      if(response.ok) {
+        const panelData = await response.json();
+        repairButton.disabled = false;
+        if(panelData.error) {
+          currentDegradationBar.innerText = "No panel found";
+          repairButton.disabled = true;
+          throw new Error();
+        }
+        currentDegradationBar.innerText = `${panelData.efficiency}% - ${panelData.severity}`;
+        return;
+      };
+    }
+    catch(error) {
+      console.log(`ERROR: panel not found`);
+    }
+  }, 600);
+});
+
+// Initiate repair
+repairButton.addEventListener('click', async () => {
+  try {
+    const response = await fetch(`/api/fix-panel/${panelInputID.value}`);
+    closePopupForm(panelInputID.value);
+    showMessage(parseInt((panelInputID.value).replace(/\D/g, '')));
+    // console.log(await response.json());
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+});
+
+// Close message popup box
+toastCloseButton.addEventListener('click', () => {
+  closeMessage();
+});
 
 startProgram();

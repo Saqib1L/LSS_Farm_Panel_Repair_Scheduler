@@ -17,11 +17,7 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 // ADD THIS: Tell Express to serve the outside 'scripts' folder at the '/scripts' URL
 app.use('/scripts', express.static(path.join(__dirname, '..', 'scripts')));
 
-app.get('/grids/:grid', (req, res) => {
-  const grid = req.params.grid;
-  console.log(`User is currently viewing grid: ${grid}`);
-});
-
+// Retrieving top 30 worst panels from main_queue.json
 app.get('/maintenance-queue', async (req, res) => {
   try {
     const rawData = await fs.readFile(path.join(__dirname, '..', 'sources', 'main_queue.json'), 'utf8');
@@ -33,6 +29,7 @@ app.get('/maintenance-queue', async (req, res) => {
   }
 });
 
+// API for retrieving panel information using form repairment
 app.get('/api/repair-panel/:panel_id', async (req, res) => {
   let panelId = req.params.panel_id;
   let panel = await retrievePanel(panelId);
@@ -43,6 +40,7 @@ app.get('/api/repair-panel/:panel_id', async (req, res) => {
   res.status(200).json({error: "Panel not found"});
 });
 
+// API for replacing the efficiency of a panel to 100%
 app.get('/api/fix-panel/:panel_id', async (req, res) => {
   let panelId = req.params.panel_id;
   let panel = await fixPanel(panelId);
@@ -53,6 +51,7 @@ app.get('/api/fix-panel/:panel_id', async (req, res) => {
   res.status(200).json({error: "Panel not found"});
 });
 
+// Retrieving grids statistic from statistics.json
 app.get('/retrieve-grids', (req, res) => {
     // HTTP headers for SSE connection
   res.writeHead(200, {
