@@ -49,7 +49,7 @@ const connectToRanking = () => {
   client_ranking.on('error', (err) => {
     if(err.code === "ECONNREFUSED") {
       console.log("[PANEL_SIMULATION][SENDER][TARGET: RANKS]: Receiver not ready yet. Retrying in 1 second...");
-      setTimeout(connectToStatistic, 1000);
+      setTimeout(connectToRanking, 1000);
     };
   });
 
@@ -203,6 +203,29 @@ function runSimulation() {
 const updateData = async () => {
   await fs.writeFile(filePath, JSON.stringify(PanelData, null, 2));
 };
+
+// Retrieve specific panel by id
+export const retrievePanel = async (id) => {
+  // Remove everything except numbers
+  const parsedId = parseInt(id.replace(/\D/g, ''));
+  if(PanelData[parsedId-1]) {
+    return PanelData[parsedId-1];
+  };
+  return false;
+};
+
+export const fixPanel = async (id) => {
+  // Remove everything except numbers
+  const parsedId = parseInt(id.replace(/\D/g, ''));
+  if(PanelData[parsedId-1]) {
+    PanelData[parsedId-1].efficiency = 100;
+    PanelData[parsedId-1].severity = "Healthy";
+    PanelData[parsedId-1].maintenance_priority = "None";
+    return PanelData[parsedId-1];
+  };
+  return false;
+}
+
 // Open connection
 connectToStatistic();
 connectToRanking();

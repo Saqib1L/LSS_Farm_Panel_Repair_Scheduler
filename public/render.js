@@ -47,13 +47,23 @@ async function populateFarmSummary(data) {
   summaryLoss.innerText = `RM ${totals.loss.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-const panelGrid         = document.getElementById('panelGrid');
-const statsPanel        = document.getElementById('statsPanel');
-let zoneStream = null;
-let fetchStream = null;
-let activeZone = null;
-let contentDisplayed = false;
-const statisticsContent = `
+const panelGrid                    = document.getElementById('panelGrid');
+const statsPanel                   = document.getElementById('statsPanel');
+const [closeButton1, closeButton2] = document.querySelectorAll('.close-button');
+const repairFormView               = document.getElementById('repairModal');
+const generateFormRepairButton     = document.getElementById('generateFormRepairButton');
+const panelInputID                 = document.getElementById('panel-id-input');
+const panelInputDescription        = document.getElementById('panel-desc-input');
+const currentDegradationBar        = document.getElementById('currentDegradationBar');
+const repairButton                 = document.querySelector('.repair-button');
+const successMessageBox            = document.getElementById('success-toast');
+const toastMessage                 = document.getElementById('toast-message');
+const toastCloseButton             = document.getElementById('close-toast');
+let   zoneStream                   = null;
+let   fetchStream                  = null;
+let   activeZone                   = null;
+let   contentDisplayed             = false;
+const statisticsContent            = `
   <div class="stats-card">
     <div class="stats-card__header">
       <h2>Grid Information</h2>
@@ -103,7 +113,7 @@ const statisticsContent = `
         <strong class="stat-value"><span id="panel_info_worst_panel_eff">--</span>%</strong>
       </div>
     </div>
-    <button id="close-btn-statistic-info" onClick="closeWindow(event)" class="stats-panel__close">
+    <button id="close-btn-statistic-info" onclick="closeWindow(event)" class="stats-panel__close">
       ✖
     </button>
   </div>
@@ -188,12 +198,87 @@ statsPanel.addEventListener('click', (event) => {
   contentDisplayed = !contentDisplayed;
 });
 
+// Open pop-up form
+function openPopupForm() {
+  panelInputID.value = "";
+  panelInputDescription.innerText = "";
+  currentDegradationBar.innerText = "No panel found";
+  repairFormView.classList.toggle('close-popup-form', false);
+}
+generateFormRepairButton.addEventListener('click', () => openPopupForm());
+
+
+// Close button for pop-up form
+function closePopupForm() {
+  repairFormView.classList.toggle('close-popup-form', true);
+}
+closeButton1.addEventListener('click', () => closePopupForm());
+closeButton2.addEventListener('click', () => closePopupForm());
+
+
+// Retrieving input from html tag input and fetching the data from back-end
+let setDebounce = null;
+panelInputID.addEventListener('input', () => {
+  if(setDebounce) {
+    clearTimeout(setDebounce);
+  };
+  setDebounce = setTimeout(async () => {
+    try {
+      console.log(`INPUT VAL: ${panelInputID.value}`);
+      const response = await fetch(`/api/repair-panel/${panelInputID.value || '-'}`);
+      if(response.ok) {
+        const panelData = await response.json();
+        repairButton.disabled = false;
+        if(panelData.error) {
+          currentDegradationBar.innerText = "No panel found";
+          repairButton.disabled = true;
+          throw new Error();
+        }
+        currentDegradationBar.innerText = `${panelData.efficiency}% - ${panelData.severity}`;
+        return;
+      };
+    }
+    catch(error) {
+      console.log(`ERROR: panel not found`);
+    }
+  }, 600);
+});
+
+// Successfull message popup
+function showMessage(panelId) {
+  successMessageBox.classList.toggle('show', true);
+  toastMessage.innerText = `Panel SP${String(panelId).padStart(7, '0')} has successfully been repaired`;
+};
+
+function closeMessage() { successMessageBox.classList.toggle('show', false) };
+
+
+// Initiate repair
+repairButton.addEventListener('click', async () => {
+  try {
+    const response = await fetch(`/api/fix-panel/${panelInputID.value}`);
+    closePopupForm(panelInputID.value);
+    showMessage(parseInt((panelInputID.value).replace(/\D/g, '')));
+    // console.log(await response.json());
+  } catch (error) {
+    console.log("Error: ", error);
+  }
+});
+
+// Close message popup box
+toastCloseButton.addEventListener('click', () => {
+  closeMessage();
+});
+
+
 // Close button callback to close the stats window (UI)
 function closeWindow(event) {
   if (!event.target.matches('.stats-panel__close')) return;
   if (zoneStream) zoneStream.close();
   statsPanel.innerHTML = defaultContent;
 };
+// As the js script type set to module, it is necessary to keep the onlick attribute working
+window.closeWindow = closeWindow;
 
 async function fetchMaintenanceQueue() {
   const response = await fetch('/maintenance-queue');
@@ -225,15 +310,6 @@ function renderMaintenanceItem(panel, rank) {
   maintenanceRank.innerText = `#${rank}`;
   maintenancePanelID.innerText = `Panel ${panel.id}`;
   maintenanceEfficiency.innerText = `${panel.efficiency}%`;
-  
-  // return `
-  //   <div class="maintenance-item" data-panel-id="${panel.id}" tabindex="0" role="button">
-  //     <span class="maintenance-item__rank">#${rank}</span>
-  //     <span class="maintenance-item__id">Panel ${panel.id}</span>
-  //     <span class="maintenance-item__efficiency" data-status="${status}">${panel.efficiency}%</span>
-  //     </div>
-  //     `;
-
 }
     
 function generateTemplate() {

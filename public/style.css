@@ -25,6 +25,10 @@
     --font-mono: 'JetBrains Mono', monospace;
 }
 
+button {
+  user-select: none;
+}
+
 body {
     font-family: var(--font-body);
     background: var(--color-bg);
@@ -154,6 +158,10 @@ body {
 .maintenance-queue__header {
     padding: 20px 18px;
     border-bottom: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
 }
 
 .maintenance-queue__title {
@@ -485,4 +493,341 @@ body {
     display: grid;
     grid-template-columns: repeat(20, 1fr);
     gap: 8px;
+}
+
+/* Button Styling */
+/* =========================================
+   Option A: High-Emphasis Primary Button 
+   (Use if this triggers an immediate action)
+   ========================================= */
+.btn-repair-primary {
+  /* Reset default styles */
+  appearance: none;
+  border: none;
+  background-color: transparent;
+  
+  /* Core styling */
+  background-color: #2563eb; /* Vibrant, professional blue */
+  color: #ffffff;
+  font-family: inherit; /* Inherits your dashboard's font */
+  font-size: 14px;
+  font-weight: 500;
+  
+  /* Spacing and shape */
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  
+  /* Alignment for potential icons */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  
+  /* Smooth interaction transitions */
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+/* Hover state: Slightly darker blue */
+.btn-repair-primary:hover {
+  background-color: #1d4ed8;
+}
+
+/* Active state: Slight scale down for a "pressed" feel */
+.btn-repair-primary:active {
+  transform: scale(0.97);
+}
+
+/* Focus state: For keyboard accessibility */
+.btn-repair-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #0f172a, 0 0 0 4px #60a5fa; /* Navy offset with blue ring */
+}
+
+
+/* =========================================
+   Option B: Secondary Ghost Button 
+   (Use for opening menus or settings)
+   ========================================= */
+.btn-repair-secondary {
+  /* Reset default styles */
+  appearance: none;
+  
+  /* Core styling - transparent background with a border */
+  background-color: transparent;
+  color: #cbd5e1; /* Light slate text */
+  border: 1px solid #475569; /* Medium slate border */
+  
+  /* Typography */
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  
+  /* Spacing and shape */
+  padding: 7px 15px; /* Slightly reduced to account for the 1px border */
+  border-radius: 6px;
+  cursor: pointer;
+  
+  /* Alignment */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  
+  /* Smooth interaction transitions */
+  transition: all 0.2s ease;
+}
+
+/* Hover state: Fill with a subtle background and brighten text */
+.btn-repair-secondary:hover {
+  background-color: #334155;
+  color: #f8fafc;
+  border-color: #64748b;
+}
+
+/* Active state */
+.btn-repair-secondary:active {
+  transform: scale(0.97);
+}
+
+/* Focus state */
+.btn-repair-secondary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #0f172a, 0 0 0 4px #94a3b8;
+}
+
+/* FORM design */
+/* =========================================
+   Modal Backdrop & Layout
+   ========================================= */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(11, 17, 32, 0.8); /* Dark semi-transparent overlay */
+  backdrop-filter: blur(4px); /* Adds a modern blur to the background */
+  
+  /* Flexbox to center the modal perfectly */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background-color: #1e293b; /* Slightly lighter than the main app bg */
+  border: 1px solid #334155;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  font-family: inherit;
+}
+
+/* =========================================
+   Modal Header
+   ========================================= */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #334155;
+}
+
+.modal-title {
+  color: #f8fafc;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.btn-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 24px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.btn-close:hover {
+  color: #f8fafc;
+  background-color: crimson;
+}
+
+/* =========================================
+   Modal Body & Form Elements
+   ========================================= */
+.modal-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Spacing between form groups */
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  color: #cbd5e1;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-input {
+  background-color: #0f172a; /* Deep recessed background for inputs */
+  border: 1px solid #334155;
+  color: #f8fafc;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #3b82f6; /* Blue highlight on focus */
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.form-input::placeholder {
+  color: #475569;
+}
+
+/* =========================================
+   Status Badge Layout
+   ========================================= */
+.form-status-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.status-badge-severe {
+  background-color: rgba(220, 38, 38, 0.15); /* Translucent dark red */
+  color: #fca5a5; /* Bright red text */
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* =========================================
+   Modal Footer
+   ========================================= */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  background-color: rgba(15, 23, 42, 0.3); /* Slightly darker footer */
+  border-top: 1px solid #334155;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.close-popup-form {
+  display: none;
+}
+
+/* Container & Animation Setup */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 320px;
+  padding: 16px;
+  gap: 12px;
+  background-color: rgba(31, 41, 55, 0.95); /* Deep dark background */
+  border: 1px solid rgba(34, 197, 94, 0.3); /* Subtle green border */
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  font-family: sans-serif;
+  
+  /* Hidden state by default */
+  transform: translateX(150%);
+  opacity: 0;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+/* This class is added by JavaScript to slide it in */
+.toast-container.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* Icon Styling */
+.toast-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  color: #4ade80; /* Bright green icon */
+  background-color: rgba(34, 197, 94, 0.2); /* Soft green backdrop */
+  border-radius: 8px;
+}
+.toast-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Text Content */
+.toast-content {
+  flex: 1;
+  font-size: 14px;
+}
+.toast-title {
+  display: block;
+  font-weight: 600;
+  color: #4ade80;
+  margin-bottom: 2px;
+}
+.toast-text {
+  color: #9ca3af; /* Light gray text */
+}
+
+/* Close Button */
+.toast-close {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  transition: color 0.2s, background-color 0.2s;
+}
+.toast-close:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.toast-close svg {
+  width: 12px;
+  height: 12px;
 }
