@@ -42,27 +42,20 @@
 
     <aside class="maintenance-queue">
         <div class="maintenance-queue__header">
-            <h2 class="maintenance-queue__title">Maintenance Queue</h2>
-            <p class="maintenance-queue__subtitle">Top 30 worst panels</p>
+            <div>
+                <h2 class="maintenance-queue__title">Maintenance Queue</h2>
+                <p class="maintenance-queue__subtitle">Top 30 worst panels</p>
+            </div>
+            <div>
+                <!-- For the primary action -->
+                <button class="btn-repair-primary" id="generateFormRepairButton">
+                Repair Panel
+                </button>
+            </div>
         </div>
 
         <!-- Populated by MaintenanceQueueView.render(panels) -->
         <div class="maintenance-queue__list" id="maintenanceQueueList">
-            <!-- <div class="maintenance-item" data-panel-id="18239" tabindex="0" role="button">
-                <span class="maintenance-item__rank">#1</span>
-                <span class="maintenance-item__id">Panel 18239</span>
-                <span class="maintenance-item__efficiency" data-status="severe">41.8%</span>
-            </div>
-            <div class="maintenance-item" data-panel-id="9732" tabindex="0" role="button">
-                <span class="maintenance-item__rank">#2</span>
-                <span class="maintenance-item__id">Panel 9732</span>
-                <span class="maintenance-item__efficiency" data-status="severe">43.2%</span>
-            </div>
-            <div class="maintenance-item" data-panel-id="62818" tabindex="0" role="button">
-                <span class="maintenance-item__rank">#3</span>
-                <span class="maintenance-item__id">Panel 62818</span>
-                <span class="maintenance-item__efficiency" data-status="severe">44.5%</span>
-            </div> -->
         </div>
     </aside>
 
@@ -83,6 +76,68 @@
                 <div class="panel-grid__cell" data-row="0" data-col="9" data-zone-id="ZONE-R1-C10" data-status="minor" tabindex="0" role="button" aria-label="Zone R1-C10"></div>
             </div>
         </section>
+        <!-- Success Toast Popup -->
+        <div id="success-toast" class="toast-container">
+            
+            <!-- Green Check Icon -->
+            <div class="toast-icon">
+                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
+                </svg>
+            </div>
+            
+            <!-- Text Content -->
+            <div class="toast-content">
+                <span class="toast-title">System Updated</span>
+                <span id="toast-message" class="toast-text">Data synchronized successfully.</span>
+            </div>
+            
+            <!-- Manual Close Button -->
+            <button id="close-toast" class="toast-close">
+                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- The Overlay Backdrop -->
+        <div class="modal-backdrop close-popup-form" id="repairModal">
+            <!-- The Modal Container -->
+            <div class="modal-card">
+                
+                <!-- Header -->
+                <div class="modal-header">
+                <h2 class="modal-title">Panel Repair Configuration</h2>
+                <button class="btn-close close-button" aria-label="Close modal">&times;</button>
+                </div>
+                
+                <!-- Body / Form -->
+                <div class="modal-body">
+                <div class="form-group">
+                    <label for="panel-id" class="form-label">Panel ID</label>
+                    <input type="text" id="panel-id-input" class="form-input" placeholder="e.g., SP0000001" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="panel-desc" class="form-label">Issue Description</label>
+                    <textarea id="panel-desc-input" class="form-input" rows="3" placeholder="Describe the visible damage or output failure..."></textarea>
+                </div>
+                
+                <div class="form-status-group">
+                    <span class="form-label" id="currentStatusBar">Current Status:</span>
+                    <!-- Mimicking the 0% badge from your sidebar -->
+                    <span class="status-badge-severe" id="currentDegradationBar">0% - Severe Degradation</span>
+                </div>
+                </div>
+                
+                <!-- Footer / Actions -->
+                <div class="modal-footer">
+                <button class="btn-repair-secondary close-button">Cancel</button>
+                <button class="btn-repair-primary repair-button">Initiate Repair</button>
+                </div>
+                
+            </div>
+        </div>
 
         <!-- Populated by ZoneStatsView.render(zoneData), streamed as HTML from the backend over SSE -->
         <div class="stats-panel" id="statsPanel">
@@ -90,6 +145,6 @@
         </div>
     </main>
 </div>
-    <script src="./render.js"></script>
+    <script src="./render.js" type="module"></script>
 </body>
 </html>
