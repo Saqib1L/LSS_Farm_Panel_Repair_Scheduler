@@ -165,6 +165,10 @@ function fetchGrids() {
     }
     populateFarmSummary(data);
   }
+  fetchStream.onerror = () => {
+    fetchStream.close();
+    setTimeout(fetchGrids, 500);
+  };
 }
 
 // Open pop-up form
@@ -260,24 +264,49 @@ function generateTemplate() {
   panelGrid.innerHTML = htmlContent;
 }
 
+let maintenanceIntervalId = null;
+
+function startMaintenancePolling() {
+  if (maintenanceIntervalId) return;
+  updateMaintenanceQueue();
+  maintenanceIntervalId = setInterval(updateMaintenanceQueue, 1000);
+}
+
+function stopMaintenancePolling() {
+  if (maintenanceIntervalId) {
+    clearInterval(maintenanceIntervalId);
+    maintenanceIntervalId = null;
+  }
+}
+
 function startProgram() {
   generateTemplate();
   fetchGrids();
-  updateMaintenanceQueue();
-  setInterval(updateMaintenanceQueue, 1000);
+  startMaintenancePolling();
 }
+
+// Pause polling & SSE when the tab is hidden, resume when visible
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    stopMaintenancePolling();
+    if (fetchStream) fetchStream.close();
+  } else {
+    fetchGrids();
+    startMaintenancePolling();
+  }
+});
 
 
 // ========= Add Event Listiner ========= //
 // Clicking on panel grid to reveal the window of grids stats
 panelGrid.addEventListener('click', (event) => {
+  const cell = event.target.closest('.panel-grid__cell');
+  if (!cell) return;
   if(!contentDisplayed) {
     statsPanel.innerHTML = statisticsContent;
     contentDisplayed = !contentDisplayed;
   }
-  const cell = event.target.closest('.panel-grid__cell');
   activeZone = cell.dataset.zoneId;
-  if (!cell) return;
 });
 
 panelGrid.addEventListener('keydown', (event) => {

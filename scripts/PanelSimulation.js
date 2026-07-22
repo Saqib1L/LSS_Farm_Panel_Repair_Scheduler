@@ -6,15 +6,17 @@ import fs from 'fs/promises';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const filePath = path.join(__dirname, '..', 'sources', 'data.json');
+const isMainModule = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(__filename);
 
 const totalData = 200000;
 
 // Connection properties for streaming data
 const PORT_FOR_STATISTIC = 9000;
 const PORT_FOR_RANK_PANEL = 9001;
-const PORT_FOR_REPAIR = 5000;
+const PORT_FOR_REPAIR = 9002;
 const HOST = '127.0.0.1';
 let client_statistic;
 let client_ranking;
@@ -84,6 +86,13 @@ const connectToRepair = net.createServer((socket) => {
           return;
         }
       }
+      if (action === 'lookup' && id) {
+        const parsedId = parseInt(id.replace(/\D/g, ''));
+        if (PanelData[parsedId - 1]) {
+          socket.write(JSON.stringify({ ok: true, panel: PanelData[parsedId - 1] }) + '\n');
+          return;
+        }
+      }
       socket.write(JSON.stringify({ ok: false, error: "Panel not found" }) + '\n');
     } catch {
       socket.write(JSON.stringify({ ok: false, error: "Bad request" }) + '\n');
@@ -91,9 +100,11 @@ const connectToRepair = net.createServer((socket) => {
   });
 });
 
-connectToRepair.listen(PORT_FOR_REPAIR, HOST, () => {
-  console.log("[PANEL_SIMULATION][FIX_LISTENER]: Listening on port ", PORT_FOR_REPAIR);
-});
+if (isMainModule) {
+  connectToRepair.listen(PORT_FOR_REPAIR, HOST, () => {
+    console.log("[PANEL_SIMULATION][FIX_LISTENER]: Listening on port ", PORT_FOR_REPAIR);
+  });
+}
 
 // Sending data to statistics.js
 const sendStreamData = () => {
@@ -233,17 +244,8 @@ const updateData = async () => {
   await fs.writeFile(filePath, JSON.stringify(PanelData, null, 2));
 };
 
-// Retrieve specific panel by id
-export const retrievePanel = async (id) => {
-  // Remove everything except numbers
-  const parsedId = parseInt(id.replace(/\D/g, ''));
-  if(PanelData[parsedId-1]) {
-    return PanelData[parsedId-1];
-  };
-  return false;
-};
-
-// Open connection
-connectToStatistic();
-connectToRanking();
-runSimulation();
+if (isMainModule) {
+  connectToStatistic();
+  connectToRanking();
+  runSimulation();
+}
