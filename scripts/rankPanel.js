@@ -10,24 +10,6 @@ async function saveTopWorstPanels(topWorstPanels) {
   await fs.writeFile(outputPath, JSON.stringify(topWorstPanels, null, 2));
 }
 
-// Retrieve data from data.json
-// const readData = async () => {
-//   // File validation checking
-//   try {
-//     const rawData = await fs.readFile(filePath, 'utf8');
-//     if(!rawData.trim()) {
-//       return [];
-//     }
-//     return JSON.parse(rawData);
-//   } catch (error) {
-//     if(error.code === "ENOENT") {
-//       console.log("[SERVER]: The data.json does not exists, the program is creating one...");
-//       await fs.writeFile(filePath, JSON.stringify([], null, 2));
-//       return [];
-//     }
-//   }
-// };
-
 // Variables declaration
 const worstPanelLimit = 30; 
 const PORT = 9001;
@@ -44,17 +26,18 @@ const server = net.createServer((socket) => {
   rl.on('line', (line) => {
     const batch = JSON.parse(line); // Received 5000 items
     for (const item of batch) {
-      // if(!updateTimer) updateTimer = setTimeout(sortPanels(), 1000);
+
       // Validate & Update
       if(item.id !== undefined) {
         panels.set(item.id, item);
       };
-      if(!updateTimer) {
-        updateTimer = setTimeout(() => {
-          sortPanels();
-          updateTimer = null;
-        }, 1000);
-      }
+
+      // Set debouncer
+      if(updateTimer) clearTimeout(updateTimer)
+      updateTimer = setTimeout(() => {
+        sortPanels();
+        updateTimer = null;
+      }, 500);
     };
   });
   
@@ -65,7 +48,6 @@ server.listen(PORT, HOST, () => {
 });
 
 const sortPanels = async () => {
-  // let panels = await readData();
   let sortedPanels = [...panels.values()].map(item => item.val);
   let totalPanels = sortedPanels.length;
   

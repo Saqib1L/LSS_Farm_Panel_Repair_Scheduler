@@ -63,6 +63,7 @@ app.get('/retrieve-grids', (req, res) => {
   const sendUpdate = async () => {    
     try {
       const gridData = await fs.readFile(path.join(__dirname, '..', 'sources', 'statistics.json'), 'utf8');
+      if(!gridData || !gridData.trim()) return;
       const gridInfo = JSON.parse(gridData);
       // Safety check: Only send if the zone actually exists
       if (gridInfo) {
@@ -78,7 +79,7 @@ app.get('/retrieve-grids', (req, res) => {
 
   const updateEverySecond = setInterval(() => {
     sendUpdate();
-    console.log(`Every content of grids are updated for every 1 second`);
+    console.log(`[SERVER]: Every content of grids are updated for every 1 second`);
   }, 1000);
 
   req.on('close', () => {
