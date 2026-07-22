@@ -1,13 +1,34 @@
 import express from "express";
+import net from 'net';
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from 'fs/promises';
-import { retrievePanel, fixPanel } from "./panelSimulation.js";
+import { retrievePanel } from "./PanelSimulation.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const mainPage = "index.html";
 const app = express();
 const PORT = 3000;
+const PORT_FOR_SIMULATION = 5000;
+const HOST = '127.0.0.1';
+
+function sendFixCommand(panelId) {
+  return new Promise((resolve, reject) => {
+    const client = new net.Socket();
+    let buffer = '';
+    client.connect(PORT_FOR_SIMULATION, HOST, () => {
+      client.write(JSON.stringify({ action: 'fix', id: panelId }) + '\n');
+    });
+    client.on('data', (chunk) => {
+      buffer += chunk.toString();
+      if (buffer.includes('\n')) {
+        client.end();
+        try { resolve(JSON.parse(buffer.trim())); } catch (err) { reject(err); }
+      }
+    });
+    client.on('error', reject);
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`[SERVER]: The server is running on port ${PORT}`);
@@ -43,12 +64,12 @@ app.get('/api/repair-panel/:panel_id', async (req, res) => {
 // API for replacing the efficiency of a panel to 100%
 app.get('/api/fix-panel/:panel_id', async (req, res) => {
   let panelId = req.params.panel_id;
-  let panel = await fixPanel(panelId);
-  if(panel) {
-    res.json(panel);
-    return;
+  try {
+    const result = await sendFixCommand(panelId);
+    result.ok ? res.json(result.panel) : res.json({ error: result.error });
+  } catch {
+    res.status(500).json({ error: "Could not reach simulation service" });
   }
-  res.status(200).json({error: "Panel not found"});
 });
 
 // Retrieving grids statistic from statistics.json
@@ -88,3 +109,4 @@ app.get('/retrieve-grids', (req, res) => {
     res.end();
   });
 });
+

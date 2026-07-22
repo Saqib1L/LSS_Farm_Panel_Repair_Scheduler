@@ -1,5 +1,5 @@
 import net from 'net';
-
+import readline from 'readline';
 let PanelData = [];
 
 import fs from 'fs/promises';
@@ -14,9 +14,11 @@ const totalData = 200000;
 // Connection properties for streaming data
 const PORT_FOR_STATISTIC = 9000;
 const PORT_FOR_RANK_PANEL = 9001;
+const PORT_FOR_REPAIR = 5000;
 const HOST = '127.0.0.1';
 let client_statistic;
 let client_ranking;
+let client_repair;
 
 // Connect to statistics functions 
 const connectToStatistic = () => {
@@ -65,6 +67,33 @@ const connectToRanking = () => {
   // Trigger connection
   client_ranking.connect(PORT_FOR_RANK_PANEL, HOST);
 }
+
+// Connect to repair panel functions
+const connectToRepair = net.createServer((socket) => {
+  const rl = readline.createInterface({ input: socket });
+  rl.on('line', (line) => {
+    try {
+      const { action, id } = JSON.parse(line);
+      if (action === 'fix' && id) {
+        const parsedId = parseInt(id.replace(/\D/g, ''));
+        if (PanelData[parsedId - 1]) {
+          PanelData[parsedId - 1].efficiency = 100;
+          PanelData[parsedId - 1].severity = "Healthy";
+          PanelData[parsedId - 1].maintenance_priority = "None";
+          socket.write(JSON.stringify({ ok: true, panel: PanelData[parsedId - 1] }) + '\n');
+          return;
+        }
+      }
+      socket.write(JSON.stringify({ ok: false, error: "Panel not found" }) + '\n');
+    } catch {
+      socket.write(JSON.stringify({ ok: false, error: "Bad request" }) + '\n');
+    }
+  });
+});
+
+connectToRepair.listen(PORT_FOR_REPAIR, HOST, () => {
+  console.log("[PANEL_SIMULATION][FIX_LISTENER]: Listening on port ", PORT_FOR_REPAIR);
+});
 
 // Sending data to statistics.js
 const sendStreamData = () => {
@@ -213,18 +242,6 @@ export const retrievePanel = async (id) => {
   };
   return false;
 };
-
-export const fixPanel = async (id) => {
-  // Remove everything except numbers
-  const parsedId = parseInt(id.replace(/\D/g, ''));
-  if(PanelData[parsedId-1]) {
-    PanelData[parsedId-1].efficiency = 100;
-    PanelData[parsedId-1].severity = "Healthy";
-    PanelData[parsedId-1].maintenance_priority = "None";
-    return PanelData[parsedId-1];
-  };
-  return false;
-}
 
 // Open connection
 connectToStatistic();

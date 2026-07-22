@@ -115,7 +115,7 @@ const calculateStatistics = () => {
       case "high":
         stats.prior_high++;
         break;
-      default:
+      default:  
         break;
     };
   });
