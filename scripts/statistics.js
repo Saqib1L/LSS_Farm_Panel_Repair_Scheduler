@@ -28,12 +28,13 @@ const server = net.createServer((socket) => {
         panels.set(item.id, item);
       };
 
-      if(updateTimer) clearTimeout(updateTimer);
-      updateTimer = setTimeout(() => {
-        const statisticsResult = calculateStatistics();
-        updateData(statisticsResult);
-        updateTimer = null;
-      }, 500);
+      if(!updateTimer) {
+        updateTimer = setTimeout(() => {
+          const statisticsResult = calculateStatistics();
+          updateData(statisticsResult);
+          updateTimer = null;
+        }, 1000);
+      };
     };
   });
 });

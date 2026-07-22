@@ -33,11 +33,12 @@ const server = net.createServer((socket) => {
       };
 
       // Set debouncer
-      if(updateTimer) clearTimeout(updateTimer)
-      updateTimer = setTimeout(() => {
-        sortPanels();
-        updateTimer = null;
-      }, 500);
+      if(!updateTimer) {
+        updateTimer = setTimeout(() => {
+          sortPanels();
+          updateTimer = null;
+        }, 1000);
+      }
     };
   });
   
