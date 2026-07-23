@@ -240,7 +240,7 @@ body {
 }
 
 .panel-grid-section {
-    flex: 1;
+    margin-left: -340px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -403,7 +403,7 @@ body {
   font-size: 0.875rem;
   color: var(--color-text-muted, #8993a4);
   display: block;
-  margin-bottom: 4px;
+  margin: 8px 0;
 }
 
 .stat-value {
@@ -711,9 +711,16 @@ body {
    ========================================= */
 .form-status-group {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: start;
   gap: 12px;
   padding-top: 4px;
+}
+
+.form-status-div {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .status-badge-severe {

@@ -30,6 +30,7 @@ const statisticsContent            = `
       <h2>Grid Information</h2>
       <span class="stat-label">Zone: <span id="grid_zone">--</span></span>
       <span id="panel_info_status" class="status-badge">--</span>
+      <span class="stat-label">Time complexity: O(N)</span>
     </div>
 
     <div class="stats-card__overview">
@@ -334,10 +335,11 @@ panelInputID.addEventListener('input', () => {
   if(setDebounce) {
     clearTimeout(setDebounce);
   };
+  let userInput = !panelInputID.value ? '-' : panelInputID.value > 0 ? panelInputID.value : '-';
   setDebounce = setTimeout(async () => {
     try {
       console.log(`INPUT VAL: ${panelInputID.value}`);
-      const response = await fetch(`/api/repair-panel/${panelInputID.value || '-'}`);
+      const response = await fetch(`/api/repair-panel/${userInput}`);
       if(response.ok) {
         const panelData = await response.json();
         repairButton.disabled = false;
