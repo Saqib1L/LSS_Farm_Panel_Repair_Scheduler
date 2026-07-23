@@ -37,21 +37,13 @@ The following represents illustrative assumptions to quantify business impact:
 
 - About
 - Features
-- Demo
 - Screenshots
+- Demo
 - Tech Stack
 - Project Structure
 - Installation
-- Usage
-- API (if applicable)
-- Configuration
-- Testing
-- Deployment
-- Roadmap
-- Contributing
-- License
-- Author
-- Acknowledgements
+- Authors
+- References
 
 ---
 
@@ -79,10 +71,6 @@ You can also include GIFs.
 ---
 
 # 🎥 Demo
-
-Live Website
-
-https://yourwebsite.com
 
 Video Demo
 
@@ -171,7 +159,7 @@ npm run start-all
 
 ---
 
-# 👤 Author
+# 👤 Authors
 
 **1. Muhammad Saqib (24009307)**
 
@@ -183,5 +171,5 @@ npm run start-all
 
 **5. Jade Brochard (26006896)**
 
-# 🔍 Resources
+# 🔍 References
 [1] Eco-Business, “TNB subsidiary partners with Envision Digital to digitalise operations of its largest solar power project in Malaysia,” Eco-Business, May 2020. https://www.eco-business.com/press-releases/tnb-subsidiary-partners-with-envision-digital-to-digitalise-operations-of-its-largest-solar-power-project-in-malaysia/ (accessed Jun. 24, 2026).
