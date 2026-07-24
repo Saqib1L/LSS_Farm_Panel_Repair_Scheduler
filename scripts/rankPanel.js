@@ -49,26 +49,27 @@ server.listen(PORT, HOST, () => {
 });
 
 const sortPanels = async () => {
-  let sortedPanels = [...panels.values()].map(item => item.val);
+  let sortedPanels = [...panels.values()]; 
   let totalPanels = sortedPanels.length;
   
   // partial bubble sort
-  for (let i = 0; i < worstPanelLimit && i < totalPanels; i++) {
+for (let i = 0; i < totalPanels - 1; i++) {
     let swapped = false;
-    
-    for (let j = totalPanels - 1; j > i; j--) {
+  
+    for (let j = 0; j < totalPanels - i - 1; j++) {
       
-      if (sortedPanels[j].efficiency < sortedPanels[j - 1].efficiency) {
-        
+      if (sortedPanels[j].efficiency > sortedPanels[j + 1].efficiency) {
         let temp = sortedPanels[j];
-        sortedPanels[j] = sortedPanels[j - 1];
-        sortedPanels[j - 1] = temp;
+        sortedPanels[j] = sortedPanels[j + 1];
+        sortedPanels[j + 1] = temp;
         
         swapped = true;
       }
     }
     if (!swapped) break;
   }
+  
+  // Take 30 worst
   let topWorstPanels = sortedPanels.slice(0, worstPanelLimit);
   
   // Rewriting the result to the main_queue.json
